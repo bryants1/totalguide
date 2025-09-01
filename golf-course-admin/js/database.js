@@ -123,7 +123,7 @@ export class DatabaseManager {
   // --------------------------------------------------------------------------
   async loadAllCourseData(courseNumber) {
     try {
-      const [primary, scores, vector, analysis, reviews, usgolf, scraping, reviewUrls, teesAndPars] = await Promise.all([
+      const [primary, scores, vector, analysis, reviews, usgolf, googleplaces, scraping, reviewUrls, teesAndPars] = await Promise.all([
         this.getCurrentPrimaryData(courseNumber).catch(err => {
           console.warn(`Primary data error for ${courseNumber}:`, err.message);
           return null;
@@ -148,6 +148,10 @@ export class DatabaseManager {
           console.warn(`USGolf data error for ${courseNumber}:`, err.message);
           return null;
         }),
+        this.loadGooglePlacesData(courseNumber).catch(err => {  // ADD THIS
+          console.warn(`Google Places data error for ${courseNumber}:`, err.message);
+          return null;
+        }),
         this.getCourseInfoData(courseNumber).catch(err => {
           console.warn(`Course info data error for ${courseNumber}:`, err.message);
           return null;
@@ -169,14 +173,41 @@ export class DatabaseManager {
         analysis,
         reviews,
         usgolf,
+        googleplaces,  // ADD THIS
         scraping,
         reviewUrls,
-        teesAndPars
+        tees: teesAndPars.tees,
+        pars: teesAndPars.pars
       };
     } catch (error) {
       console.error(`LoadAllCourseData error for ${courseNumber}:`, error);
       throw error;
     }
+  }
+
+  // Also add this method to load Google Places data
+  async loadGooglePlacesData(courseNumber) {
+      try {
+          // Use this.client instead of this.supabaseClient
+          const { data, error } = await this.client
+              .from('google_places_data')
+              .select('*')
+              .eq('course_number', courseNumber)
+              .single();
+
+          if (error) {
+              if (error.code === 'PGRST116') {
+                  // No data found - this is OK
+                  return null;
+              }
+              throw error;
+          }
+
+          return data;
+      } catch (error) {
+          console.error(`Error loading Google Places data for ${courseNumber}:`, error);
+          throw error;
+      }
   }
 
   // --------------------------------------------------------------------------
@@ -580,31 +611,30 @@ export class DatabaseManager {
   // Field-type helpers used by DataUpdater
   // --------------------------------------------------------------------------
   getFieldMappings() {
-    return {
-      // Priority 1: Google Places mappings
-      google_places_data: {
-        display_name: 'course_name',
-        formatted_address: 'formatted_address',
-        street_number: 'street_number',
-        route: 'route',
-        street_address: 'street_address',
-        city: 'city',
-        state: 'state',
-        zip_code: 'zip_code',
-        county: 'county',
-        country: 'country',
-        phone: 'phone',
-        website: 'website',
-        latitude: 'latitude',
-        longitude: 'longitude',
-        place_id: 'place_id',
-        user_rating_count: 'google_review_count',
-        primary_type: 'primary_type',
-        opening_hours: 'opening_hours',
-        photo_reference: 'photo_reference',
-        google_maps_link: 'google_maps_link'
-      },
-
+      return {
+        // Priority 1: Google Places mappings - ONLY INCLUDE FIELDS WE WANT TO PROMOTE
+        google_places_data: {
+          display_name: 'course_name',
+          formatted_address: 'formatted_address',
+          street_number: 'street_number',
+          route: 'route',
+          street_address: 'street_address',
+          city: 'city',
+          state: 'state',
+          zip_code: 'zip_code',
+          county: 'county',
+          country: 'country',
+          phone: 'phone',
+          website: 'website',
+          latitude: 'latitude',
+          longitude: 'longitude',
+          place_id: 'place_id',
+          user_rating_count: 'user_rating_count',
+          primary_type: 'primary_type',
+          opening_hours: 'opening_hours',
+          photo_reference: 'photo_reference',
+          google_maps_link: 'google_maps_link'
+        },
       // Priority 2: Course Scraping Data mappings (highest for content)
       course_scraping_data: {
         name: 'course_name',

@@ -7,12 +7,14 @@
  */
 
 import { DataImportManager } from './modules/data-import-manager.js';
+import { PrimaryDataPromoter } from './modules/primary-data-promoter.js';
 
 export class PipelineManager {
   constructor() {
     this.container = null;
     this.database = null;
     this.utils = this._createUtils();
+    this.dataPromoter = new PrimaryDataPromoter(this);
 
     // Core manager (required for Excel/CSV)
     this.dataImport = new DataImportManager(this);
@@ -27,7 +29,11 @@ export class PipelineManager {
 
   setDatabase(database) {
     this.database = database;
+    if (this.dataPromoter) {
+    this.dataPromoter.setDatabase(database);
+}
   }
+
 
   _createUtils() {
     return {

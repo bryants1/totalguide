@@ -21,13 +21,45 @@ export class DataRenderer {
   constructor() {}
 
   // =========================
-  // OVERVIEW / PRIMARY PANEL
+  // WRAPPER METHOD FOR APP.JS COMPATIBILITY
   // =========================
   /**
-   * Renders the Overview (Primary) panel.
-   * When showEmptyShell=true, renders the full section shell with placeholders.
+   * This method is called by app.js with (data, container) parameters
+   * It wraps the internal rendering method to match the expected interface
    */
-  renderPrimaryData(data, courseNumber, teesAndParsData = null, options = {}) {
+  renderPrimaryData(data, container) {
+    // Handle both calling conventions
+    if (container && container.nodeType === 1) {
+      // Called with (data, DOMElement) - new style from app.js
+      if (!data) {
+        container.innerHTML = '<div class="status info">No primary data found for this course</div>';
+        return;
+      }
+
+      const courseNumber = data.course_number;
+      const teesAndParsData = {
+        tees: data.tees || [],
+        pars: data.pars || null
+      };
+
+      // Generate HTML using internal method
+      const htmlContent = this.renderPrimaryDataInternal(data, courseNumber, teesAndParsData);
+
+      // Set the HTML content to the container
+      container.innerHTML = htmlContent;
+    } else {
+      // Called with old parameters - return HTML string
+      return this.renderPrimaryDataInternal(data, container, arguments[2], arguments[3]);
+    }
+  }
+
+  // =========================
+  // INTERNAL PRIMARY DATA RENDERER
+  // =========================
+  /**
+   * Internal method that generates HTML string for primary data
+   */
+  renderPrimaryDataInternal(data, courseNumber, teesAndParsData = null, options = {}) {
     const { showEmptyShell = false } = options;
     const d = data || {};
 
@@ -93,6 +125,79 @@ export class DataRenderer {
         <div class="full-width-sections">
           ${this.renderFullWidthSection('Pricing Information','💰',pricing,d,courseNumber)}
           ${this.renderFullWidthSection('Important URLs','🔗',urls,d,courseNumber)}
+        </div>
+      </div>
+    `;
+  }
+
+  // =========================
+  // TEES DATA RENDERER
+  // =========================
+  renderTeesData(tees, courseNumber, pars = null) {
+    if (!tees || tees.length === 0) {
+      return '';
+    }
+
+    return `
+      <div class="tees-pars-section">
+        <h3>⛳ Tees & Pars Information</h3>
+        <div class="tees-table-container">
+          <table class="tees-pars-table">
+            <thead>
+              <tr>
+                <th>Tee</th>
+                <th>Rating</th>
+                <th>Slope</th>
+                <th>1</th>
+                <th>2</th>
+                <th>3</th>
+                <th>4</th>
+                <th>5</th>
+                <th>6</th>
+                <th>7</th>
+                <th>8</th>
+                <th>9</th>
+                <th>Out</th>
+                <th>10</th>
+                <th>11</th>
+                <th>12</th>
+                <th>13</th>
+                <th>14</th>
+                <th>15</th>
+                <th>16</th>
+                <th>17</th>
+                <th>18</th>
+                <th>In</th>
+                <th>Total</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${pars ? `
+                <tr class="pars-row">
+                  <td><strong>Par</strong></td>
+                  <td>-</td>
+                  <td>-</td>
+                  ${[1,2,3,4,5,6,7,8,9].map(i => this._parCell(pars[`hole_${i}`])).join('')}
+                  <td><strong>${pars.out_9 || '-'}</strong></td>
+                  ${[10,11,12,13,14,15,16,17,18].map(i => this._parCell(pars[`hole_${i}`])).join('')}
+                  <td><strong>${pars.in_9 || '-'}</strong></td>
+                  <td><strong>${pars.total_par || '-'}</strong></td>
+                </tr>` : ''
+              }
+              ${tees.map(tee => `
+                <tr>
+                  <td>${tee.tee_name || '-'}</td>
+                  <td>${tee.rating || '-'}</td>
+                  <td>${tee.slope || '-'}</td>
+                  ${[1,2,3,4,5,6,7,8,9].map(i => `<td>${tee[`hole_${i}`] || '-'}</td>`).join('')}
+                  <td><strong>${tee.out_9 || '-'}</strong></td>
+                  ${[10,11,12,13,14,15,16,17,18].map(i => `<td>${tee[`hole_${i}`] || '-'}</td>`).join('')}
+                  <td><strong>${tee.in_9 || '-'}</strong></td>
+                  <td><strong>${tee.total_yardage || '-'}</strong></td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
         </div>
       </div>
     `;
@@ -448,6 +553,100 @@ export class DataRenderer {
       </details>
     `;
   }
+
+  /**
+   * Google Places Data Panel Renderer
+   */
+   renderGooglePlacesData(data) {
+     if (!data) return this.renderEmpty('No Google Places data found for this course', '📍');
+     const d = data;
+
+     return `
+       <div class="data-grid">
+         <div class="data-card">
+           <h3>📍 Basic Information</h3>
+           <div class="field-grid">
+             ${this.renderField('Place ID', d.place_id)}
+             ${this.renderField('Display Name', d.display_name)}
+             ${this.renderField('Primary Type', d.primary_type)}
+             ${this.renderField('Course Number', d.course_number)}
+           </div>
+         </div>
+
+         <div class="data-card">
+           <h3>🗺️ Location Details</h3>
+           <div class="field-grid">
+             ${this.renderField('Formatted Address', d.formatted_address)}
+             ${this.renderField('Street Number', d.street_number)}
+             ${this.renderField('Route', d.route)}
+             ${this.renderField('Street Address', d.street_address)}
+             ${this.renderField('City', d.city)}
+             ${this.renderField('State', d.state)}
+             ${this.renderField('County', d.county)}
+             ${this.renderField('ZIP Code', d.zip_code)}
+             ${this.renderField('Country', d.country)}
+           </div>
+         </div>
+
+         <div class="data-card">
+           <h3>📍 Coordinates</h3>
+           <div class="field-grid">
+             ${this.renderField('Latitude', d.latitude)}
+             ${this.renderField('Longitude', d.longitude)}
+             ${this.renderField('Google Maps Link', d.google_maps_link ? `<a href="${d.google_maps_link}" target="_blank" class="clickable-url">View on Google Maps</a>` : null)}
+           </div>
+         </div>
+
+         <div class="data-card">
+           <h3>📞 Contact & Business Info</h3>
+           <div class="field-grid">
+             ${this.renderField('Phone', d.phone)}
+             ${this.renderField('Website', d.website ? `<a href="${d.website}" target="_blank" class="clickable-url">${d.website}</a>` : null)}
+             ${this.renderField('Opening Hours', d.opening_hours)}
+           </div>
+         </div>
+
+         <div class="data-card">
+           <h3>⭐ Reviews & Media</h3>
+           <div class="field-grid">
+             ${this.renderField('User Rating Count', d.user_rating_count)}
+             ${this.renderField('Photo Reference', d.photo_reference ? `<code style="font-size:11px; word-break:break-all;">${d.photo_reference.substring(0, 50)}...</code>` : null)}
+           </div>
+         </div>
+
+         <div class="data-card">
+           <h3>🕐 Timestamps</h3>
+           <div class="field-grid">
+             ${this.renderField('Created At', formatDate(d.created_at))}
+             ${this.renderField('Updated At', formatDate(d.updated_at))}
+           </div>
+         </div>
+       </div>
+
+       <details style="margin-top:25px;">
+         <summary style="cursor:pointer; font-weight:600; color:#2c3e50; font-size:1.1rem;">View Raw Google Places Data JSON</summary>
+         <div class="json-block">${this._jsonBlock(d)}</div>
+       </details>
+     `;
+ }
+
+  // Helper method for formatting opening hours
+  _formatOpeningHours(hours) {
+      if (typeof hours === 'string') {
+          try {
+              const parsed = JSON.parse(hours);
+              if (parsed.weekday_text) {
+                  return `<ul style="list-style:none; padding:0; margin:5px 0;">
+                      ${parsed.weekday_text.map(day => `<li style="padding:3px 0;">${day}</li>`).join('')}
+                  </ul>`;
+              }
+          } catch {
+              return hours;
+          }
+      }
+      return hours || 'Not available';
+  }
+
 
   // =========================
   // WEBSITE SCRAPING PANEL

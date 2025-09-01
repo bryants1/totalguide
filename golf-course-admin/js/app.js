@@ -598,63 +598,64 @@ class GolfCourseAdmin {
     // ============================================================================
 
     async loadCourseData() {
-      const courseNumber = document.getElementById('courseSelect')?.value;
+        const courseNumber = document.getElementById('courseSelect')?.value;
 
-      if (!courseNumber) {
-        // NEW: show the page with placeholder content instead of hiding it
-        const courseDataEl = document.getElementById('courseData');
-        const primaryTab = document.getElementById('primaryTab');
-        if (courseDataEl) courseDataEl.classList.remove('hidden');
+        if (!courseNumber) {
+            // Show empty shell
+            const courseDataEl = document.getElementById('courseData');
+            const primaryTab = document.getElementById('primaryTab');
+            if (courseDataEl) courseDataEl.classList.remove('hidden');
 
-        // Defensive: ensure containers & tabs exist
-        this.ensureTabContainers();
-        if (!this.tabManager.tabs?.length) this.setupTabs();
+            this.ensureTabContainers();
+            if (!this.tabManager.tabs?.length) this.setupTabs();
 
-        if (primaryTab) {
-          primaryTab.innerHTML = this.renderer.renderPrimaryData(
-            null,           // no data yet
-            null,           // no course number
-            null,           // no tees/pars
-            { showEmptyShell: true } // shell with placeholders
-          );
-        }
-        return; // keep the rest unchanged
-      }
-
-      try {
-        showStatus('<div class="loader"></div> Loading course data...', 'info', 'connectionStatus');
-
-        const courseData = await this.db.loadAllCourseData(courseNumber);
-        this.currentCourseData = courseData;
-
-        const courseName = courseData.primary?.course_name ||
-                           courseData.scraping?.name ||
-                           courseData.usgolf?.course_name ||
-                           `Course ${courseNumber}`;
-
-        const courseTitle = document.getElementById('courseTitle');
-        if (courseTitle) {
-            courseTitle.textContent = `${courseNumber} - ${courseName}`;
+            if (primaryTab) {
+                primaryTab.innerHTML = this.renderer.renderPrimaryDataInternal(
+                    null,
+                    null,
+                    null,
+                    { showEmptyShell: true }
+                );
+            }
+            return;
         }
 
-        this.renderAllData(courseData, courseNumber);
+        try {
+            showStatus('<div class="loader"></div> Loading course data...', 'info', 'connectionStatus');
 
-        const updateBtn = document.getElementById('updateDataBtn');
-        if (updateBtn) {
-            updateBtn.style.display = courseData.primary ? 'flex' : 'none';
+            // Load all course data including Google Places
+            const courseData = await this.db.loadAllCourseData(courseNumber);
+            this.currentCourseData = courseData;
+
+            const courseName = courseData.primary?.course_name ||
+                              courseData.scraping?.name ||
+                              courseData.usgolf?.course_name ||
+                              `Course ${courseNumber}`;
+
+            const courseTitle = document.getElementById('courseTitle');
+            if (courseTitle) {
+                courseTitle.textContent = `${courseNumber} - ${courseName}`;
+            }
+
+            // Call renderAllData with both parameters
+            this.renderAllData(courseData, courseNumber);  // FIX: Pass both parameters
+
+            const updateBtn = document.getElementById('updateDataBtn');
+            if (updateBtn) {
+                updateBtn.style.display = courseData.primary ? 'flex' : 'none';
+            }
+
+            const courseDataElement = document.getElementById('courseData');
+            if (courseDataElement) {
+                courseDataElement.classList.remove('hidden');
+            }
+
+            showStatus(`✅ Loaded data for ${courseName}`, 'success', 'connectionStatus');
+
+        } catch (error) {
+            showStatus(`❌ Error loading course data: ${error.message}`, 'error', 'connectionStatus');
+            console.error('Load course data error:', error);
         }
-
-        const courseDataElement = document.getElementById('courseData');
-        if (courseDataElement) {
-            courseDataElement.classList.remove('hidden');
-        }
-
-        showStatus(`✅ Loaded data for ${courseName}`, 'success', 'connectionStatus');
-
-      } catch (error) {
-        showStatus(`❌ Error loading course data: ${error.message}`, 'error', 'connectionStatus');
-        console.error('Load course data error:', error);
-      }
     }
 
     exposeGlobalMethods() {
@@ -699,12 +700,13 @@ class GolfCourseAdmin {
     setupTabs() {
         const tabs = [
             { id: 'primary', label: 'Primary Data', icon: '📊' },
+            { id: 'usgolf', label: 'Initial Course Data', icon: '📋' },
+            { id: 'googleplaces', label: 'Google Places', icon: '📍' },  // ADD THIS
+            { id: 'scraping', label: 'Course Info', icon: '🔍' },
+            { id: 'reviews', label: 'Reviews', icon: '💬' },
             { id: 'scores', label: 'Course Scores', icon: '⭐' },
             { id: 'vector', label: 'Vector Attributes', icon: '🎯' },
             { id: 'analysis', label: 'Comprehensive Analysis', icon: '📈' },
-            { id: 'reviews', label: 'Reviews', icon: '💬' },
-            { id: 'usgolf', label: 'Initial Course Data', icon: '📋' },
-            { id: 'scraping', label: 'Course Info', icon: '🔍' },
             { id: 'pipeline', label: 'Pipeline', icon: '🔄' }
         ];
 
@@ -797,49 +799,93 @@ class GolfCourseAdmin {
     // DATA RENDERING & UPDATES
     // ============================================================================
 
-    renderAllData(courseData, courseNumber) {
-        const primaryTab = document.getElementById('primaryTab');
-        if (primaryTab) {
-            const primaryHTML = `
-                <div class="update-buttons-section">
-                    <!-- (keep your existing buttons exactly as-is) -->
-                </div>
+    // 1. Fix the setupTabs method (around line 506)
+  setupTabs() {
+      const tabs = [
+          { id: 'primary', label: 'Primary Data', icon: '📊' },
+          { id: 'usgolf', label: 'Initial Course Data', icon: '📋' },
+          { id: 'googleplaces', label: 'Google Places', icon: '📍' },  // ADD THIS
+          { id: 'scraping', label: 'Course Info', icon: '🔍' },
+          { id: 'reviews', label: 'Reviews', icon: '💬' },
+          { id: 'scores', label: 'Course Scores', icon: '⭐' },
+          { id: 'vector', label: 'Vector Attributes', icon: '🎯' },
+          { id: 'analysis', label: 'Comprehensive Analysis', icon: '📈' },
+          { id: 'pipeline', label: 'Pipeline', icon: '🔄' }
+      ];
 
-                <div id="updateProgress" class="update-progress">
-                    <h4 style="margin:0 0 15px 0; color:#4a7c59;">📊 Data Update Progress</h4>
-                    <div id="progressContent"></div>
-                </div>
+      if (this.tabManager && this.tabManager.setupTabs) {
+          this.tabManager.setupTabs(tabs);
+      } else {
+          this.createTabsManually(tabs);
+      }
+  }
 
-                <div id="primaryDataContent">
-                    ${this.renderer.renderPrimaryData(
-                        courseData.primary || null,
-                        courseNumber,
-                        courseData.teesAndPars,
-                        { showEmptyShell: !courseData.primary } // <-- key flag
-                    )}
-                </div>
-            `;
-            primaryTab.innerHTML = primaryHTML;
-        }
+  // 2. Fix the renderAllData method (around line 588)
+  async renderAllData(courseData, courseNumber) {  // FIX: Accept courseData as first parameter
+      try {
+          // Get tab containers
+          const primaryTab = document.getElementById('primaryTab');
+          const usgolfTab = document.getElementById('usgolfTab');
+          const googleplacesTab = document.getElementById('googleplacesTab');
+          const scrapingTab = document.getElementById('scrapingTab');
+          const reviewsTab = document.getElementById('reviewsTab');
+          const scoresTab = document.getElementById('scoresTab');
+          const vectorTab = document.getElementById('vectorTab');
+          const analysisTab = document.getElementById('analysisTab');
 
-        const tabs = [
-            { id: 'scores',   data: courseData.scores,   renderer: 'renderScoresData' },
-            { id: 'vector',   data: courseData.vector,   renderer: 'renderVectorData' },
-            { id: 'analysis', data: courseData.analysis, renderer: 'renderAnalysisData' },
-            { id: 'reviews',  data: courseData.reviews,  renderer: 'renderReviewsData' },
-            { id: 'usgolf',   data: courseData.usgolf,   renderer: 'renderUSGolfData' },
-            { id: 'scraping', data: courseData.scraping, renderer: 'renderScrapingData' }
-        ];
+          // Render Primary Data (Overview)
+          if (primaryTab && courseData.primary) {
+              const teesAndParsData = {
+                  tees: courseData.tees || [],
+                  pars: courseData.pars || null
+              };
+              primaryTab.innerHTML = this.renderer.renderPrimaryDataInternal(
+                  courseData.primary,
+                  courseNumber,
+                  teesAndParsData
+              );
+          }
 
-        tabs.forEach(tab => {
-            const tabElement = document.getElementById(`${tab.id}Tab`);
-            if (tabElement && this.renderer[tab.renderer]) {
-                tabElement.innerHTML = this.renderer[tab.renderer](tab.data);
-            }
-        });
+          // Render USGolf Initial Data
+          if (usgolfTab && courseData.usgolf) {
+              usgolfTab.innerHTML = this.renderer.renderUSGolfData(courseData.usgolf);
+          }
 
-        console.log('All data rendered');
-    }
+          // Render Google Places Data
+          if (googleplacesTab && courseData.googleplaces) {
+              googleplacesTab.innerHTML = this.renderer.renderGooglePlacesData(courseData.googleplaces);
+          }
+
+          // Render Scraping Data
+          if (scrapingTab && courseData.scraping) {
+              scrapingTab.innerHTML = this.renderer.renderScrapingData(courseData.scraping);
+          }
+
+          // Render Reviews
+          if (reviewsTab && courseData.reviews) {
+              reviewsTab.innerHTML = this.renderer.renderReviewsData(courseData.reviews);
+          }
+
+          // Render Scores
+          if (scoresTab && courseData.scores) {
+              scoresTab.innerHTML = this.renderer.renderScoresData(courseData.scores);
+          }
+
+          // Render Vector Attributes
+          if (vectorTab && courseData.vector) {
+              vectorTab.innerHTML = this.renderer.renderVectorData(courseData.vector);
+          }
+
+          // Render Analysis
+          if (analysisTab && courseData.analysis) {
+              analysisTab.innerHTML = this.renderer.renderAnalysisData(courseData.analysis);
+          }
+
+      } catch (error) {
+          console.error('Error rendering data:', error);
+          showStatus(`❌ Error rendering data: ${error.message}`, 'error', 'connectionStatus');
+      }
+  }
 
     async updatePrimaryData() {
         const courseNumber = document.getElementById('courseSelect')?.value;
