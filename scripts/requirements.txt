@@ -1,0 +1,14 @@
+matplotlib
+geopandas
+pandas
+requests
+shapely
+pillow
+numpy
+contextily
+osmnx
+openpyxl
+scipy
+rasterio
+py3dep
+meteostat

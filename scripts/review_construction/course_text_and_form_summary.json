@@ -1,0 +1,126 @@
+{
+  "total_reviews": 219,
+  "reviews_by_source": {
+    "Google": 18,
+    "GolfPass": 160,
+    "GolfNow": 41
+  },
+  "overall_rating": 4.14,
+  "recommend_percent": 97.0,
+  "form_category_averages": {
+    "Conditions": 4.28,
+    "Value": 4.52,
+    "Layout": 4.47,
+    "Friendliness": 4.33,
+    "Pace": 4.17,
+    "Amenities": 3.84,
+    "Difficulty": 3.38
+  },
+  "text_insight_averages": {
+    "Fairways": 0.816,
+    "Greens": 0.643,
+    "Bunkers": 0.2,
+    "Tee Boxes": 0.767,
+    "Shot Variety / Hole Uniqueness": 0.62,
+    "Signature Holes / Quirky/Fun Design Features": 0.671,
+    "Water & OB Placement": 0.433,
+    "Overall feel / Scenery": 0.772,
+    "Green Complexity": 0.494,
+    "Driving Range": 1.0,
+    "Putting & Short Game Areas": 0.833,
+    "Availability": 0.394,
+    "Snack Bar-1, Snack Bar w/ Alcohol-2, Grill w/ Alcohol-3, Full Bar & Lounge-4, Full Service Restaurant-5": 1.0,
+    "Locker room & Showers": 1.0,
+    "Pro-shop": 0.167,
+    "Staff Friendliness, After-Round Experience": 0.567,
+    "Eco-friendless and sustainability": 1.0,
+    "Course History": 1.0,
+    "Architect": 1.0,
+    "Green Fees vs. Quality": 0.808,
+    "Replay Value": 0.807,
+    "Ease of Walking": 0.25,
+    "Pace of Play": 0.289
+  },
+  "top_text_themes": [
+    [
+      "Course condition",
+      13
+    ],
+    [
+      "Value for money",
+      8
+    ],
+    [
+      "Course Conditions: Good",
+      8
+    ],
+    [
+      "Friendly staff",
+      6
+    ],
+    [
+      "course condition",
+      5
+    ],
+    [
+      "well maintained",
+      4
+    ],
+    [
+      "Course Conditions: Excellent",
+      4
+    ],
+    [
+      "Off-Course Amenities: Good",
+      4
+    ],
+    [
+      "slow greens",
+      3
+    ],
+    [
+      "hidden gem",
+      3
+    ],
+    [
+      "nice layout",
+      3
+    ],
+    [
+      "New greens",
+      3
+    ],
+    [
+      "frequent play",
+      3
+    ],
+    [
+      "friendly staff",
+      3
+    ],
+    [
+      "Remote location",
+      3
+    ],
+    [
+      "Off-Course Amenities: Excellent",
+      3
+    ],
+    [
+      "Course Difficulty: Somewhat Challenging",
+      3
+    ],
+    [
+      "Off-Course Amenities: Average",
+      3
+    ],
+    [
+      "First-time experience",
+      2
+    ],
+    [
+      "Great value",
+      2
+    ]
+  ]
+}

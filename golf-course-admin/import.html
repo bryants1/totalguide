@@ -1,0 +1,1538 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Golf Data Importer - Excel Only</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f8fafc;
+        }
+
+        .container {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        h1 {
+            color: #16a34a;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 5px;
+            color: #374151;
+        }
+
+        input[type="text"], input[type="password"], input[type="file"], input[type="url"], select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.2s;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: #22c55e;
+        }
+
+        .btn {
+            background: #22c55e;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            margin-right: 10px;
+        }
+
+        .btn:hover {
+            background: #16a34a;
+        }
+
+        .btn:disabled {
+            background: #9ca3af;
+            cursor: not-allowed;
+        }
+
+        .btn.secondary {
+            background: #6b7280;
+        }
+
+        .btn.secondary:hover {
+            background: #4b5563;
+        }
+
+        .status {
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            font-weight: 500;
+        }
+
+        .status.success {
+            background: #dcfce7;
+            color: #166534;
+            border: 1px solid #bbf7d0;
+        }
+
+        .status.error {
+            background: #fef2f2;
+            color: #dc2626;
+            border: 1px solid #fecaca;
+        }
+
+        .status.info {
+            background: #dbeafe;
+            color: #1d4ed8;
+            border: 1px solid #bfdbfe;
+        }
+
+        .status.warning {
+            background: #fef3c7;
+            color: #92400e;
+            border: 1px solid #fde68a;
+        }
+
+        .progress {
+            background: #f3f4f6;
+            border-radius: 8px;
+            height: 8px;
+            overflow: hidden;
+            margin: 10px 0;
+        }
+
+        .progress-bar {
+            background: #22c55e;
+            height: 100%;
+            transition: width 0.3s;
+        }
+
+        .log {
+            background: #1f2937;
+            color: #f9fafb;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            max-height: 400px;
+            overflow-y: auto;
+            font-size: 13px;
+            margin-top: 15px;
+            white-space: pre-wrap;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .mapping-info {
+            background: #f0f9ff;
+            border: 1px solid #bae6fd;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 15px 0;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 15px 0;
+        }
+
+        .stat-box {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 15px;
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 24px;
+            font-weight: bold;
+            color: #16a34a;
+        }
+
+        .stat-label {
+            font-size: 14px;
+            color: #64748b;
+            margin-top: 5px;
+        }
+
+        .section {
+            background: #f0f9ff;
+            border: 1px solid #bae6fd;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 15px;
+        }
+
+        .two-col {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🏌️ Golf Data Importer - Excel & New Courses</h1>
+        <p>Import golf course data from Excel files or add new courses to Supabase database</p>
+
+        <div class="form-group">
+            <label for="supabaseUrl">Supabase Project URL</label>
+            <input type="text" id="supabaseUrl" placeholder="https://your-project.supabase.co">
+        </div>
+
+        <div class="form-group">
+            <label for="supabaseKey">Supabase Anon Key</label>
+            <input type="password" id="supabaseKey" placeholder="Your anon key">
+        </div>
+
+        <button onclick="connectDatabase()" class="btn" id="connectBtn">Connect to Database</button>
+
+        <div id="connectionStatus"></div>
+
+        <!-- Main Excel Import Section -->
+        <div id="importSection" class="hidden">
+            <div class="mapping-info">
+                <h3>📋 Automatic Column Mapping</h3>
+                <p><strong>Initial Course Upload:</strong> Columns A, C-J, L-N, P, S-V, CC</p>
+                <p><strong>Google Places:</strong> Columns CD-CW</p>
+                <p><strong>Review URLs:</strong> Columns CX-CY</p>
+                <p><strong>Excluded:</strong> Columns B, O, K, Q, R, W-CB (as requested)</p>
+            </div>
+
+            <div class="form-group">
+                <label for="excelFile">Upload Excel File</label>
+                <input type="file" id="excelFile" accept=".xlsx,.xls" onchange="handleFileSelect(event)">
+            </div>
+
+            <button onclick="analyzeData()" class="btn secondary" id="analyzeBtn" disabled>🔍 Analyze Data First</button>
+            <button onclick="importData()" class="btn" id="importBtn" disabled>🚀 Import Data</button>
+            <button onclick="clearAllData()" class="btn" style="background: #dc2626; margin-top: 10px;" id="clearBtn">🗑️ Clear All Data</button>
+
+            <div id="analysisResults"></div>
+            <div id="importStatus"></div>
+            <div id="importProgress" class="hidden">
+                <div class="progress">
+                    <div class="progress-bar" id="progressBar"></div>
+                </div>
+                <div id="progressText">Preparing import...</div>
+            </div>
+            <div id="importLog" class="log hidden"></div>
+        </div>
+
+        <!-- New Course Addition Section -->
+        <div id="newCourseSection" class="hidden">
+            <div class="section">
+                <h2>🆕 Add New Courses</h2>
+                <p>Add individual courses or upload a CSV file with course data</p>
+
+                <!-- Upload Mode Toggle -->
+                <div style="margin-bottom: 20px;">
+                    <button onclick="toggleUploadMode('manual')" class="btn secondary" id="manualModeBtn">✏️ Manual Entry</button>
+                    <button onclick="toggleUploadMode('csv')" class="btn secondary" id="csvModeBtn">📄 CSV Upload</button>
+                </div>
+
+                <!-- Manual Entry Form -->
+                <div id="manualEntryForm" class="hidden">
+                    <h3>Manual Course Entry</h3>
+                    <div class="grid">
+                        <div class="form-group">
+                            <label for="courseName">Course Name *</label>
+                            <input type="text" id="courseName" placeholder="Enter course name">
+                        </div>
+                        <div class="form-group">
+                            <label for="courseAddress">Street Address</label>
+                            <input type="text" id="courseAddress" placeholder="Enter street address">
+                        </div>
+                        <div class="form-group">
+                            <label for="courseCity">City *</label>
+                            <input type="text" id="courseCity" placeholder="Enter city">
+                        </div>
+                        <div class="form-group">
+                            <label for="courseState">State *</label>
+                            <input type="text" id="courseState" value="MA" placeholder="Enter state">
+                        </div>
+                        <div class="form-group">
+                            <label for="courseZip">ZIP Code</label>
+                            <input type="text" id="courseZip" placeholder="Enter ZIP code">
+                        </div>
+                        <div class="form-group">
+                            <label for="courseWebsite">Website URL</label>
+                            <input type="url" id="courseWebsite" placeholder="https://example.com">
+                        </div>
+                    </div>
+                    <button onclick="addManualCourse()" class="btn">➕ Add Course</button>
+                </div>
+
+                <!-- CSV Upload Form -->
+                <div id="csvUploadForm" class="hidden">
+                    <h3>CSV File Upload</h3>
+                    <div class="form-group">
+                        <label for="csvFile">Upload CSV File</label>
+                        <input type="file" id="csvFile" accept=".csv" onchange="handleCsvFileSelect(event)">
+                    </div>
+
+                    <div id="csvMappingSection" class="hidden">
+                        <h4>🗺️ Field Mapping</h4>
+                        <p>Map your CSV columns to the required fields:</p>
+                        <div class="two-col">
+                            <div class="form-group">
+                                <label for="mapCourseName">Course Name Column *</label>
+                                <select id="mapCourseName">
+                                    <option value="">Select column...</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="mapAddress">Address Column</label>
+                                <select id="mapAddress">
+                                    <option value="">Select column...</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="mapCity">City Column *</label>
+                                <select id="mapCity">
+                                    <option value="">Select column...</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="mapState">State Column</label>
+                                <select id="mapState">
+                                    <option value="">Select column...</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="mapZip">ZIP Column</label>
+                                <select id="mapZip">
+                                    <option value="">Select column...</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="mapWebsite">Website Column</label>
+                                <select id="mapWebsite">
+                                    <option value="">Select column...</option>
+                                </select>
+                            </div>
+                        </div>
+                        <button onclick="processCsvUpload()" class="btn" id="processCsvBtn" disabled>🚀 Process CSV</button>
+                    </div>
+                </div>
+
+                <!-- New Courses List -->
+                <div id="newCoursesList" class="hidden">
+                    <h3>📋 Courses Ready for Import</h3>
+                    <div id="coursesPreview"></div>
+                    <div style="margin-top: 15px;">
+                        <button onclick="importNewCourses()" class="btn">💾 Import All Courses</button>
+                        <button onclick="clearNewCourses()" class="btn secondary">🗑️ Clear List</button>
+                    </div>
+                </div>
+
+                <!-- Pipeline Section -->
+                <div id="pipelineSection" class="hidden">
+                    <div style="background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 8px; padding: 15px; margin: 15px 0;">
+                        <h3>🔄 Data Processing Pipeline</h3>
+                        <p>Ready to run data processing pipeline for newly added courses.</p>
+                        <button onclick="startPipeline()" class="btn" style="background: #16a34a;" id="pipelineBtn">🚀 Start Pipeline</button>
+                    </div>
+                </div>
+
+                <div id="newCourseStatus"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let supabaseClient = null;
+        let excelData = null;
+        let analysisData = null;
+        let csvData = null;
+        let newCoursesQueue = [];
+        let nextCourseNumber = null;
+
+        // Pre-configured column mapping
+        const COLUMN_MAP = {
+            INITIAL_UPLOAD: {
+                course_number: 0,        // A
+                course_name: 2,          // C
+                street_address: 3,       // D
+                city: 4,                 // E
+                county: 5,               // F
+                state_or_region: 6,      // G
+                zip_code: 7,             // H
+                phone_number: 8,         // I
+                website_url: 9,          // J
+                architect: 11,           // L
+                year_built_founded: 12,  // M
+                status_type: 13,         // N
+                email_address: 15,       // P
+                total_par: 18,           // S
+                total_holes: 19,         // T
+                course_rating: 20,       // U
+                slope_rating: 21,        // V
+                total_length: 80         // CC
+            },
+
+            GOOGLE: {
+                place_id: 81,            // CD
+                display_name: 82,        // CE
+                formatted_address: 83,   // CF
+                street_number: 84,       // CG
+                route: 85,               // CH
+                street_address: 86,      // CI
+                city: 87,                // CJ
+                state: 88,               // CK
+                zip_code: 89,            // CL
+                county: 90,              // CM
+                country: 91,             // CN
+                latitude: 92,            // CO
+                longitude: 93,           // CP
+                primary_type: 94,        // CQ
+                website: 95,             // CR
+                phone: 96,               // CS
+                opening_hours: 97,       // CT
+                user_rating_count: 98,   // CU
+                photo_reference: 99,     // CV
+                google_maps_link: 100    // CW
+            },
+
+            REVIEWS: {
+                golf_now_url: 101,       // CX
+                golf_pass_url: 102       // CY
+            }
+        };
+
+        function showStatus(message, type, containerId) {
+            const container = document.getElementById(containerId);
+            container.innerHTML = `<div class="status ${type}">${message}</div>`;
+        }
+
+        function log(message, type = 'info') {
+            const logElement = document.getElementById('importLog');
+            logElement.classList.remove('hidden');
+            const timestamp = new Date().toLocaleTimeString();
+            const prefix = type === 'error' ? '❌' : type === 'warning' ? '⚠️' : type === 'success' ? '✅' : 'ℹ️';
+            logElement.textContent += `${timestamp} ${prefix} ${message}\n`;
+            logElement.scrollTop = logElement.scrollHeight;
+        }
+
+        function updateProgress(percent, text) {
+            const progressBar = document.getElementById('progressBar');
+            const progressText = document.getElementById('progressText');
+            const progressContainer = document.getElementById('importProgress');
+
+            progressContainer.classList.remove('hidden');
+            progressBar.style.width = `${percent}%`;
+            progressText.textContent = text;
+        }
+
+        async function clearAllData() {
+            if (!supabaseClient) {
+                showStatus('❌ Please connect to database first', 'error', 'importStatus');
+                return;
+            }
+
+            const confirmed = confirm('⚠️ This will delete ALL data from all tables. Are you sure?');
+
+            if (!confirmed) return;
+
+            try {
+                log('🗑️ Starting data cleanup...', 'warning');
+
+                // Delete in reverse dependency order
+                log('Deleting primary_data...');
+                const { error: primaryError } = await supabaseClient
+                    .from('primary_data')
+                    .delete()
+                    .neq('course_number', '');
+
+                log('Deleting review_urls...');
+                const { error: reviewError } = await supabaseClient
+                    .from('review_urls')
+                    .delete()
+                    .neq('course_number', '');
+
+                log('Deleting google_places_data...');
+                const { error: googleError } = await supabaseClient
+                    .from('google_places_data')
+                    .delete()
+                    .neq('course_number', '');
+
+                log('Deleting initial_course_upload...');
+                const { error: initialUploadError } = await supabaseClient
+                    .from('initial_course_upload')
+                    .delete()
+                    .neq('course_number', '');
+
+                if (primaryError || reviewError || googleError || initialUploadError) {
+                    const errors = [primaryError, reviewError, googleError, initialUploadError].filter(e => e);
+                    throw new Error(`Delete errors: ${errors.map(e => e.message).join(', ')}`);
+                }
+
+                showStatus('✅ All data deleted successfully!', 'success', 'importStatus');
+                log('🧹 All tables cleared successfully!', 'success');
+
+                // Clear analysis results
+                document.getElementById('analysisResults').innerHTML = '';
+                analysisData = null;
+
+            } catch (error) {
+                showStatus(`❌ Delete failed: ${error.message}`, 'error', 'importStatus');
+                log(`💥 Delete error: ${error.message}`, 'error');
+            }
+        }
+
+        async function connectDatabase() {
+            const url = document.getElementById('supabaseUrl').value;
+            const key = document.getElementById('supabaseKey').value;
+
+            if (!url || !key) {
+                showStatus('Please enter both Supabase URL and key', 'error', 'connectionStatus');
+                return;
+            }
+
+            try {
+                const { createClient } = supabase;
+                supabaseClient = createClient(url, key);
+
+                // Test connection with each table
+                log('Testing database connection...');
+
+                const { data: initialUploadData, error: initialUploadError } = await supabaseClient
+                    .from('initial_course_upload').select('count', { count: 'exact', head: true });
+
+                const { data: googleData, error: googleError } = await supabaseClient
+                    .from('google_places_data').select('count', { count: 'exact', head: true });
+
+                const { data: primaryData, error: primaryError } = await supabaseClient
+                    .from('primary_data').select('count', { count: 'exact', head: true });
+
+                const { data: reviewData, error: reviewError } = await supabaseClient
+                    .from('review_urls').select('count', { count: 'exact', head: true });
+
+                if (initialUploadError) log(`Initial Course Upload table error: ${initialUploadError.message}`, 'error');
+                if (googleError) log(`Google Places table error: ${googleError.message}`, 'error');
+                if (primaryError) log(`Primary data table error: ${primaryError.message}`, 'error');
+                if (reviewError) log(`Review URLs table error: ${reviewError.message}`, 'error');
+
+                if (initialUploadError || googleError || primaryError || reviewError) {
+                    throw new Error('One or more tables are not accessible');
+                }
+
+                showStatus('✅ Successfully connected to all database tables!', 'success', 'connectionStatus');
+                document.getElementById('importSection').classList.remove('hidden');
+                document.getElementById('newCourseSection').classList.remove('hidden');
+                log('Database connection successful!', 'success');
+
+                // Get next available course number
+                await getNextCourseNumber();
+
+            } catch (error) {
+                showStatus(`❌ Connection failed: ${error.message}`, 'error', 'connectionStatus');
+                log(`Connection failed: ${error.message}`, 'error');
+            }
+        }
+
+        function handleFileSelect(event) {
+            const file = event.target.files[0];
+            if (file) {
+                document.getElementById('analyzeBtn').disabled = false;
+                document.getElementById('importBtn').disabled = false;
+                showStatus(`📁 File selected: ${file.name}`, 'info', 'importStatus');
+                log(`File selected: ${file.name} (${(file.size / 1024 / 1024).toFixed(2)} MB)`);
+
+                // Clear previous analysis
+                document.getElementById('analysisResults').innerHTML = '';
+                analysisData = null;
+            }
+        }
+
+        async function analyzeData() {
+            const fileInput = document.getElementById('excelFile');
+            const file = fileInput.files[0];
+
+            if (!file) {
+                showStatus('❌ Please select a file first', 'error', 'importStatus');
+                return;
+            }
+
+            try {
+                log('📊 Starting data analysis...');
+                excelData = await readExcelFile(file);
+
+                const analysis = analyzeExcelData(excelData);
+                analysisData = analysis;
+                displayAnalysis(analysis);
+
+                log('Analysis completed!', 'success');
+
+            } catch (error) {
+                showStatus(`❌ Analysis failed: ${error.message}`, 'error', 'importStatus');
+                log(`Analysis error: ${error.message}`, 'error');
+            }
+        }
+
+        function analyzeExcelData(data) {
+            log('Analyzing Excel data structure...');
+
+            const totalRows = data.length;
+            const dataRows = totalRows - 1; // Exclude header
+
+            let courseCount = 0;
+            let googleDataCount = 0;
+            let reviewDataCount = 0;
+            const uniqueCourses = new Set();
+
+            // Sample some data
+            const sampleRows = Math.min(5, dataRows);
+            const samples = {
+                initial_upload: [],
+                google: [],
+                review: []
+            };
+
+            for (let i = 1; i <= sampleRows && i < data.length; i++) {
+                const row = data[i];
+
+                // Check Initial Upload data
+                const courseNumber = row[COLUMN_MAP.INITIAL_UPLOAD.course_number];
+                const courseName = row[COLUMN_MAP.INITIAL_UPLOAD.course_name];
+
+                // Check Google data
+                const placeId = row[COLUMN_MAP.GOOGLE.place_id];
+                const displayName = row[COLUMN_MAP.GOOGLE.display_name];
+
+                // Check Review data
+                const golfNowUrl = row[COLUMN_MAP.REVIEWS.golf_now_url];
+                const golfPassUrl = row[COLUMN_MAP.REVIEWS.golf_pass_url];
+
+                samples.initial_upload.push({
+                    course_number: courseNumber,
+                    course_name: courseName,
+                    city: row[COLUMN_MAP.INITIAL_UPLOAD.city]
+                });
+
+                samples.google.push({
+                    place_id: placeId,
+                    display_name: displayName,
+                    city: row[COLUMN_MAP.GOOGLE.city]
+                });
+
+                samples.review.push({
+                    golf_now_url: golfNowUrl,
+                    golf_pass_url: golfPassUrl
+                });
+            }
+
+            // Count data types across all rows
+            for (let i = 1; i < data.length; i++) {
+                const row = data[i];
+                const courseNumber = row[COLUMN_MAP.INITIAL_UPLOAD.course_number];
+
+                if (courseNumber) {
+                    if (!uniqueCourses.has(courseNumber)) {
+                        uniqueCourses.add(courseNumber);
+                        courseCount++;
+                    }
+                }
+
+                if (row[COLUMN_MAP.GOOGLE.place_id]) {
+                    googleDataCount++;
+                }
+
+                if (row[COLUMN_MAP.REVIEWS.golf_now_url] || row[COLUMN_MAP.REVIEWS.golf_pass_url]) {
+                    reviewDataCount++;
+                }
+            }
+
+            return {
+                totalRows,
+                dataRows,
+                courseCount,
+                googleDataCount,
+                reviewDataCount,
+                samples
+            };
+        }
+
+        function displayAnalysis(analysis) {
+            const html = `
+                <div style="background: #f0f9ff; border: 1px solid #bae6fd; border-radius: 8px; padding: 15px; margin: 15px 0;">
+                    <h3>📊 Data Analysis Results</h3>
+                    <div class="stats">
+                        <div class="stat-box">
+                            <div class="stat-number">${analysis.totalRows}</div>
+                            <div class="stat-label">Total Rows</div>
+                        </div>
+                        <div class="stat-box">
+                            <div class="stat-number">${analysis.courseCount}</div>
+                            <div class="stat-label">Unique Courses</div>
+                        </div>
+                        <div class="stat-box">
+                            <div class="stat-number">${analysis.googleDataCount}</div>
+                            <div class="stat-label">Google Places Records</div>
+                        </div>
+                        <div class="stat-box">
+                            <div class="stat-number">${analysis.reviewDataCount}</div>
+                            <div class="stat-label">Review URL Records</div>
+                        </div>
+                    </div>
+
+                    <h4>Sample Initial Upload Data:</h4>
+                    <pre style="background: #f8f9fa; padding: 10px; border-radius: 4px; font-size: 12px;">${JSON.stringify(analysis.samples.initial_upload, null, 2)}</pre>
+
+                    <h4>Sample Google Places Data:</h4>
+                    <pre style="background: #f8f9fa; padding: 10px; border-radius: 4px; font-size: 12px;">${JSON.stringify(analysis.samples.google, null, 2)}</pre>
+
+                    <h4>Sample Review Data:</h4>
+                    <pre style="background: #f8f9fa; padding: 10px; border-radius: 4px; font-size: 12px;">${JSON.stringify(analysis.samples.review, null, 2)}</pre>
+                </div>
+            `;
+
+            document.getElementById('analysisResults').innerHTML = html;
+        }
+
+        async function importData() {
+            const fileInput = document.getElementById('excelFile');
+            const file = fileInput.files[0];
+
+            if (!file || !supabaseClient) {
+                showStatus('❌ Please select a file and connect to database first', 'error', 'importStatus');
+                return;
+            }
+
+            try {
+                log('🚀 Starting import process...');
+                updateProgress(5, 'Reading Excel file...');
+
+                if (!excelData) {
+                    excelData = await readExcelFile(file);
+                }
+
+                log(`📊 Found ${excelData.length - 1} rows of data`);
+                updateProgress(10, 'Processing courses...');
+
+                // Get unique courses
+                const uniqueCourses = new Set();
+                const courseRows = [];
+
+                for (let i = 1; i < excelData.length; i++) {
+                    const courseNumber = excelData[i][COLUMN_MAP.INITIAL_UPLOAD.course_number];
+                    if (courseNumber && !uniqueCourses.has(courseNumber)) {
+                        uniqueCourses.add(courseNumber);
+                        courseRows.push({
+                            rowIndex: i,
+                            data: excelData[i]
+                        });
+                    }
+                }
+
+                log(`🎯 Processing ${courseRows.length} unique courses`);
+
+                // Import counters
+                let initialUploadImported = 0;
+                let googleImported = 0;
+                let reviewImported = 0;
+                let errors = 0;
+
+                const total = courseRows.length;
+
+                for (let idx = 0; idx < courseRows.length; idx++) {
+                    const { rowIndex, data: row } = courseRows[idx];
+
+                    try {
+                        const courseNumber = row[COLUMN_MAP.INITIAL_UPLOAD.course_number];
+                        log(`Processing course ${courseNumber} (row ${rowIndex + 1})`);
+
+                        // Import Initial Upload data
+                        const initialUploadResult = await importInitialUploadData(row);
+                        if (initialUploadResult.success) initialUploadImported++;
+
+                        // Import Google Places data (if exists)
+                        const googleResult = await importGoogleData(row);
+                        if (googleResult.success) googleImported++;
+
+                        // Import Review URLs
+                        const reviewResult = await importReviewData(row);
+                        if (reviewResult.success) reviewImported++;
+
+                        const progress = 10 + ((idx + 1) / total) * 70;
+                        updateProgress(progress, `Imported ${idx + 1}/${total} courses`);
+
+                        if ((idx + 1) % 25 === 0) {
+                            log(`✅ Progress: ${idx + 1}/${total} courses processed`, 'success');
+                        }
+
+                    } catch (error) {
+                        errors++;
+                        log(`❌ Error importing course ${row[COLUMN_MAP.INITIAL_UPLOAD.course_number]}: ${error.message}`, 'error');
+                    }
+                }
+
+                updateProgress(85, 'Creating primary data...');
+                await populatePrimaryData();
+
+                updateProgress(100, 'Import completed!');
+
+                const summary = `
+🏁 Import Summary:
+• Initial Upload Data: ${initialUploadImported}/${total} imported
+• Google Places: ${googleImported}/${total} imported
+• Review URLs: ${reviewImported}/${total} imported
+• Errors: ${errors}
+• Primary data: Updated
+                `;
+
+                showStatus('🎉 Data import completed!', 'success', 'importStatus');
+                log(summary, 'success');
+
+            } catch (error) {
+                showStatus(`❌ Import failed: ${error.message}`, 'error', 'importStatus');
+                log(`💥 Import failed: ${error.message}`, 'error');
+            }
+        }
+
+        function readExcelFile(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    try {
+                        const data = new Uint8Array(e.target.result);
+                        const workbook = XLSX.read(data, { type: 'array' });
+                        const worksheet = workbook.Sheets[workbook.SheetNames[0]];
+                        const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
+                        resolve(jsonData);
+                    } catch (error) {
+                        reject(error);
+                    }
+                };
+                reader.onerror = reject;
+                reader.readAsArrayBuffer(file);
+            });
+        }
+
+        async function importInitialUploadData(row) {
+            try {
+                const courseNumber = row[COLUMN_MAP.INITIAL_UPLOAD.course_number];
+
+                if (!courseNumber) {
+                    return { success: false, error: 'No course number' };
+                }
+
+                const initialUploadData = {
+                    course_number: courseNumber,
+                    course_name: cleanValue(row[COLUMN_MAP.INITIAL_UPLOAD.course_name]),
+                    street_address: cleanValue(row[COLUMN_MAP.INITIAL_UPLOAD.street_address]),
+                    city: cleanValue(row[COLUMN_MAP.INITIAL_UPLOAD.city]),
+                    county: cleanValue(row[COLUMN_MAP.INITIAL_UPLOAD.county]),
+                    state_or_region: cleanValue(row[COLUMN_MAP.INITIAL_UPLOAD.state_or_region]),
+                    zip_code: cleanValue(row[COLUMN_MAP.INITIAL_UPLOAD.zip_code]),
+                    phone_number: cleanValue(row[COLUMN_MAP.INITIAL_UPLOAD.phone_number]),
+                    website_url: cleanValue(row[COLUMN_MAP.INITIAL_UPLOAD.website_url]),
+                    architect: cleanValue(row[COLUMN_MAP.INITIAL_UPLOAD.architect]),
+                    year_built_founded: cleanValue(row[COLUMN_MAP.INITIAL_UPLOAD.year_built_founded]),
+                    status_type: cleanValue(row[COLUMN_MAP.INITIAL_UPLOAD.status_type]),
+                    email_address: cleanValue(row[COLUMN_MAP.INITIAL_UPLOAD.email_address]),
+                    total_par: cleanValue(row[COLUMN_MAP.INITIAL_UPLOAD.total_par]),
+                    total_holes: cleanValue(row[COLUMN_MAP.INITIAL_UPLOAD.total_holes]),
+                    course_rating: cleanValue(row[COLUMN_MAP.INITIAL_UPLOAD.course_rating]),
+                    slope_rating: cleanValue(row[COLUMN_MAP.INITIAL_UPLOAD.slope_rating]),
+                    total_length: cleanValue(row[COLUMN_MAP.INITIAL_UPLOAD.total_length]),
+                    process: true
+                };
+
+                const { error } = await supabaseClient
+                    .from('initial_course_upload')
+                    .upsert(initialUploadData, { onConflict: 'course_number' });
+
+                if (error) {
+                    log(`Initial Upload insert error for course ${courseNumber}: ${error.message}`, 'error');
+                    return { success: false, error: error.message };
+                }
+
+                return { success: true };
+
+            } catch (error) {
+                return { success: false, error: error.message };
+            }
+        }
+
+        async function importGoogleData(row) {
+            try {
+                const courseNumber = row[COLUMN_MAP.USGOLF.course_number];
+                const placeId = cleanValue(row[COLUMN_MAP.GOOGLE.place_id]);
+
+                // Only import if we have a place_id
+                if (!placeId) {
+                    return { success: false, error: 'No Google place_id' };
+                }
+
+                const googleData = {
+                    course_number: courseNumber,
+                    place_id: placeId,
+                    display_name: cleanValue(row[COLUMN_MAP.GOOGLE.display_name]),
+                    formatted_address: cleanValue(row[COLUMN_MAP.GOOGLE.formatted_address]),
+                    street_number: cleanValue(row[COLUMN_MAP.GOOGLE.street_number]),
+                    route: cleanValue(row[COLUMN_MAP.GOOGLE.route]),
+                    street_address: cleanValue(row[COLUMN_MAP.GOOGLE.street_address]),
+                    city: cleanValue(row[COLUMN_MAP.GOOGLE.city]),
+                    state: cleanValue(row[COLUMN_MAP.GOOGLE.state]),
+                    zip_code: cleanValue(row[COLUMN_MAP.GOOGLE.zip_code]),
+                    county: cleanValue(row[COLUMN_MAP.GOOGLE.county]),
+                    country: cleanValue(row[COLUMN_MAP.GOOGLE.country]),
+                    latitude: cleanValue(row[COLUMN_MAP.GOOGLE.latitude]),
+                    longitude: cleanValue(row[COLUMN_MAP.GOOGLE.longitude]),
+                    primary_type: cleanValue(row[COLUMN_MAP.GOOGLE.primary_type]),
+                    website: cleanValue(row[COLUMN_MAP.GOOGLE.website]),
+                    phone: cleanValue(row[COLUMN_MAP.GOOGLE.phone]),
+                    opening_hours: cleanValue(row[COLUMN_MAP.GOOGLE.opening_hours]),
+                    user_rating_count: cleanValue(row[COLUMN_MAP.GOOGLE.user_rating_count]),
+                    photo_reference: cleanValue(row[COLUMN_MAP.GOOGLE.photo_reference]),
+                    google_maps_link: cleanValue(row[COLUMN_MAP.GOOGLE.google_maps_link])
+                };
+
+                let { error } = await supabaseClient
+                    .from('google_places_data')
+                    .upsert(googleData);
+
+                if (error && error.message.includes('unique or exclusion constraint')) {
+                    await supabaseClient
+                        .from('google_places_data')
+                        .delete()
+                        .eq('course_number', courseNumber);
+
+                    const { error: insertError } = await supabaseClient
+                        .from('google_places_data')
+                        .insert(googleData);
+
+                    error = insertError;
+                }
+
+                if (error) {
+                    log(`Google Places insert error for course ${courseNumber}: ${error.message}`, 'error');
+                    return { success: false, error: error.message };
+                }
+
+                return { success: true };
+
+            } catch (error) {
+                return { success: false, error: error.message };
+            }
+        }
+
+        async function importReviewData(row) {
+            try {
+                const courseNumber = row[COLUMN_MAP.USGOLF.course_number];
+
+                const reviewData = {
+                    course_number: courseNumber,
+                    golf_now_url: cleanValue(row[COLUMN_MAP.REVIEWS.golf_now_url]),
+                    golf_pass_url: cleanValue(row[COLUMN_MAP.REVIEWS.golf_pass_url])
+                };
+
+                let { error } = await supabaseClient
+                    .from('review_urls')
+                    .upsert(reviewData);
+
+                if (error && error.message.includes('unique or exclusion constraint')) {
+                    await supabaseClient
+                        .from('review_urls')
+                        .delete()
+                        .eq('course_number', courseNumber);
+
+                    const { error: insertError } = await supabaseClient
+                        .from('review_urls')
+                        .insert(reviewData);
+
+                    error = insertError;
+                }
+
+                if (error) {
+                    log(`Review URLs insert error for course ${courseNumber}: ${error.message}`, 'error');
+                    return { success: false, error: error.message };
+                }
+
+                return { success: true };
+
+            } catch (error) {
+                return { success: false, error: error.message };
+            }
+        }
+
+        function cleanValue(value) {
+            if (value === null || value === undefined || value === '') {
+                return null;
+            }
+            if (typeof value === 'string') {
+                const trimmed = value.trim();
+                return trimmed === '' ? null : trimmed;
+            }
+            return value;
+        }
+
+        async function populatePrimaryData() {
+            log('🔄 Creating primary data with source tracking...');
+
+            try {
+                const { data: courses, error: coursesError } = await supabaseClient
+                    .from('initial_course_upload')
+                    .select('*');
+
+                if (coursesError) {
+                    throw coursesError;
+                }
+
+                log(`📊 Processing ${courses.length} courses for primary data`);
+
+                let primaryCreated = 0;
+                let primaryErrors = 0;
+
+                for (const course of courses) {
+                    try {
+                        const { data: googleData } = await supabaseClient
+                            .from('google_places_data')
+                            .select('*')
+                            .eq('course_number', course.course_number)
+                            .maybeSingle();
+
+                        const google = googleData;
+
+                        const primaryData = {
+                            course_number: course.course_number,
+
+                            // Google overrides Initial Upload when available
+                            course_name: google?.display_name || course.course_name,
+                            course_name_source: google?.display_name ? 'google_places_data' : 'initial_course_upload',
+                            course_name_updated_at: new Date().toISOString(),
+
+                            city: google?.city || course.city,
+                            city_source: google?.city ? 'google_places_data' : 'initial_course_upload',
+                            city_updated_at: new Date().toISOString(),
+
+                            phone: google?.phone || course.phone_number,
+                            phone_source: google?.phone ? 'google_places_data' : 'initial_course_upload',
+                            phone_updated_at: new Date().toISOString(),
+
+                            website: google?.website || course.website_url,
+                            website_source: google?.website ? 'google_places_data' : 'initial_course_upload',
+                            website_updated_at: new Date().toISOString(),
+
+                            street_address: google?.street_address || course.street_address,
+                            street_address_source: google?.street_address ? 'google_places_data' : 'initial_course_upload',
+                            street_address_updated_at: new Date().toISOString(),
+
+                            state: google?.state || course.state_or_region,
+                            state_source: google?.state ? 'google_places_data' : 'initial_course_upload',
+                            state_updated_at: new Date().toISOString(),
+
+                            zip_code: google?.zip_code || course.zip_code,
+                            zip_code_source: google?.zip_code ? 'google_places_data' : 'initial_course_upload',
+                            zip_code_updated_at: new Date().toISOString(),
+
+                            county: google?.county || course.county,
+                            county_source: google?.county ? 'google_places_data' : 'initial_course_upload',
+                            county_updated_at: new Date().toISOString(),
+
+                            // Initial Upload only fields
+                            email_address: course.email_address,
+                            email_address_source: course.email_address ? 'initial_course_upload' : null,
+                            email_address_updated_at: new Date().toISOString(),
+
+                            architect: course.architect,
+                            architect_source: course.architect ? 'initial_course_upload' : null,
+                            architect_updated_at: new Date().toISOString(),
+
+                            year_built_founded: course.year_built_founded,
+                            year_built_founded_source: course.year_built_founded ? 'initial_course_upload' : null,
+                            year_built_founded_updated_at: new Date().toISOString(),
+
+                            status_type: course.status_type,
+                            status_type_source: course.status_type ? 'initial_course_upload' : null,
+                            status_type_updated_at: new Date().toISOString(),
+
+                            total_holes: course.total_holes,
+                            total_holes_source: course.total_holes ? 'initial_course_upload' : null,
+                            total_holes_updated_at: new Date().toISOString(),
+
+                            total_par: course.total_par,
+                            total_par_source: course.total_par ? 'initial_course_upload' : null,
+                            total_par_updated_at: new Date().toISOString(),
+
+                            course_rating: course.course_rating,
+                            course_rating_source: course.course_rating ? 'initial_course_upload' : null,
+                            course_rating_updated_at: new Date().toISOString(),
+
+                            slope_rating: course.slope_rating,
+                            slope_rating_source: course.slope_rating ? 'initial_course_upload' : null,
+                            slope_rating_updated_at: new Date().toISOString(),
+
+                            total_length: course.total_length,
+                            total_length_source: course.total_length ? 'initial_course_upload' : null,
+                            total_length_updated_at: new Date().toISOString(),
+
+                            // Google only fields
+                            country: google?.country || null,
+                            country_source: google?.country ? 'google_places_data' : null,
+                            country_updated_at: new Date().toISOString(),
+
+                            latitude: google?.latitude || null,
+                            latitude_source: google?.latitude ? 'google_places_data' : null,
+                            latitude_updated_at: new Date().toISOString(),
+
+                            longitude: google?.longitude || null,
+                            longitude_source: google?.longitude ? 'google_places_data' : null,
+                            longitude_updated_at: new Date().toISOString(),
+
+                            place_id: google?.place_id || null,
+                            place_id_source: google?.place_id ? 'google_places_data' : null,
+                            place_id_updated_at: new Date().toISOString(),
+
+                            user_rating_count: google?.user_rating_count || null,
+                            user_rating_count_source: google?.user_rating_count ? 'google_places_data' : null,
+                            user_rating_count_updated_at: new Date().toISOString(),
+
+                            primary_type: google?.primary_type || null,
+                            primary_type_source: google?.primary_type ? 'google_places_data' : null,
+                            primary_type_updated_at: new Date().toISOString(),
+
+                            formatted_address: google?.formatted_address || null,
+                            formatted_address_source: google?.formatted_address ? 'google_places_data' : null,
+                            formatted_address_updated_at: new Date().toISOString(),
+
+                            opening_hours: google?.opening_hours || null,
+                            opening_hours_source: google?.opening_hours ? 'google_places_data' : null,
+                            opening_hours_updated_at: new Date().toISOString()
+                        };
+
+                        let { error } = await supabaseClient
+                            .from('primary_data')
+                            .upsert(primaryData);
+
+                        if (error && error.message.includes('unique or exclusion constraint')) {
+                            await supabaseClient
+                                .from('primary_data')
+                                .delete()
+                                .eq('course_number', course.course_number);
+
+                            const { error: insertError } = await supabaseClient
+                                .from('primary_data')
+                                .insert(primaryData);
+
+                            error = insertError;
+                        }
+
+                        if (error) {
+                            primaryErrors++;
+                            log(`Primary data error for course ${course.course_number}: ${error.message}`, 'error');
+                        } else {
+                            primaryCreated++;
+                        }
+
+                    } catch (error) {
+                        primaryErrors++;
+                        log(`Primary data processing error for course ${course.course_number}: ${error.message}`, 'error');
+                    }
+                }
+
+                log(`✅ Primary data created: ${primaryCreated} successful, ${primaryErrors} errors`, 'success');
+
+            } catch (error) {
+                log(`❌ Error creating primary data: ${error.message}`, 'error');
+                throw error;
+            }
+        }
+
+        // NEW COURSE ADDITION FUNCTIONS
+
+        async function getNextCourseNumber() {
+            try {
+                log('🔢 Getting next available course number...');
+
+                const { data, error } = await supabaseClient
+                    .from('primary_data')
+                    .select('course_number')
+                    .like('course_number', 'MA-%')
+                    .order('course_number', { ascending: false })
+                    .limit(1);
+
+                if (error) throw error;
+
+                let nextNumber = 1;
+                if (data && data.length > 0) {
+                    const lastNumber = data[0].course_number;
+                    const numPart = parseInt(lastNumber.replace('MA-', ''));
+                    nextNumber = numPart + 1;
+                }
+
+                nextCourseNumber = `MA-${nextNumber}`;
+                log(`Next course number will be: ${nextCourseNumber}`, 'success');
+
+            } catch (error) {
+                log(`Error getting next course number: ${error.message}`, 'error');
+                nextCourseNumber = 'MA-1';
+            }
+        }
+
+        function toggleUploadMode(mode) {
+            const manualForm = document.getElementById('manualEntryForm');
+            const csvForm = document.getElementById('csvUploadForm');
+            const manualBtn = document.getElementById('manualModeBtn');
+            const csvBtn = document.getElementById('csvModeBtn');
+
+            if (mode === 'manual') {
+                manualForm.classList.remove('hidden');
+                csvForm.classList.add('hidden');
+                manualBtn.style.background = '#22c55e';
+                csvBtn.style.background = '#6b7280';
+            } else {
+                csvForm.classList.remove('hidden');
+                manualForm.classList.add('hidden');
+                csvBtn.style.background = '#22c55e';
+                manualBtn.style.background = '#6b7280';
+            }
+        }
+
+        async function addManualCourse() {
+            const courseName = document.getElementById('courseName').value.trim();
+            const courseAddress = document.getElementById('courseAddress').value.trim();
+            const courseCity = document.getElementById('courseCity').value.trim();
+            const courseState = document.getElementById('courseState').value.trim();
+            const courseZip = document.getElementById('courseZip').value.trim();
+            const courseWebsite = document.getElementById('courseWebsite').value.trim();
+
+            if (!courseName || !courseCity || !courseState) {
+                showStatus('❌ Please fill in required fields: Course Name, City, and State', 'error', 'newCourseStatus');
+                return;
+            }
+
+            const newCourse = {
+                course_number: nextCourseNumber,
+                course_name: courseName,
+                street_address: courseAddress || null,
+                city: courseCity,
+                state: courseState,
+                zip_code: courseZip || null,
+                website: courseWebsite || null
+            };
+
+            newCoursesQueue.push(newCourse);
+            updateNextCourseNumber();
+            displayNewCourses();
+            clearManualForm();
+
+            showStatus(`✅ Course "${courseName}" added to queue`, 'success', 'newCourseStatus');
+            log(`Added manual course: ${courseName} (${newCourse.course_number})`, 'success');
+        }
+
+        function clearManualForm() {
+            document.getElementById('courseName').value = '';
+            document.getElementById('courseAddress').value = '';
+            document.getElementById('courseCity').value = '';
+            document.getElementById('courseState').value = 'MA';
+            document.getElementById('courseZip').value = '';
+            document.getElementById('courseWebsite').value = '';
+        }
+
+        function updateNextCourseNumber() {
+            const currentNum = parseInt(nextCourseNumber.replace('MA-', ''));
+            nextCourseNumber = `MA-${currentNum + 1}`;
+        }
+
+        function handleCsvFileSelect(event) {
+            const file = event.target.files[0];
+            if (file) {
+                readCsvFile(file).then(data => {
+                    csvData = data;
+                    setupCsvMapping(data);
+                }).catch(error => {
+                    showStatus(`❌ Error reading CSV: ${error.message}`, 'error', 'newCourseStatus');
+                });
+            }
+        }
+
+        function readCsvFile(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    try {
+                        const text = e.target.result;
+                        const lines = text.split('\n');
+                        const headers = lines[0].split(',').map(h => h.trim().replace(/"/g, ''));
+                        const data = [];
+
+                        for (let i = 1; i < lines.length; i++) {
+                            if (lines[i].trim()) {
+                                const values = lines[i].split(',').map(v => v.trim().replace(/"/g, ''));
+                                data.push(values);
+                            }
+                        }
+
+                        resolve({ headers, data });
+                    } catch (error) {
+                        reject(error);
+                    }
+                };
+                reader.onerror = reject;
+                reader.readAsText(file);
+            });
+        }
+
+        function setupCsvMapping(csvData) {
+            const { headers } = csvData;
+            const mappingSelects = [
+                'mapCourseName', 'mapAddress', 'mapCity', 'mapState', 'mapZip', 'mapWebsite'
+            ];
+
+            mappingSelects.forEach(selectId => {
+                const select = document.getElementById(selectId);
+                select.innerHTML = '<option value="">Select column...</option>';
+                headers.forEach((header, index) => {
+                    const option = document.createElement('option');
+                    option.value = index;
+                    option.textContent = header;
+                    select.appendChild(option);
+                });
+            });
+
+            // Auto-detect common column names
+            headers.forEach((header, index) => {
+                const lowerHeader = header.toLowerCase();
+                if (lowerHeader.includes('name') || lowerHeader.includes('course')) {
+                    document.getElementById('mapCourseName').value = index;
+                } else if (lowerHeader.includes('address') || lowerHeader.includes('street')) {
+                    document.getElementById('mapAddress').value = index;
+                } else if (lowerHeader.includes('city')) {
+                    document.getElementById('mapCity').value = index;
+                } else if (lowerHeader.includes('state')) {
+                    document.getElementById('mapState').value = index;
+                } else if (lowerHeader.includes('zip') || lowerHeader.includes('postal')) {
+                    document.getElementById('mapZip').value = index;
+                } else if (lowerHeader.includes('website') || lowerHeader.includes('url')) {
+                    document.getElementById('mapWebsite').value = index;
+                }
+            });
+
+            document.getElementById('csvMappingSection').classList.remove('hidden');
+            document.getElementById('processCsvBtn').disabled = false;
+
+            showStatus(`📊 CSV loaded: ${headers.length} columns, ${csvData.data.length} rows`, 'info', 'newCourseStatus');
+            log(`CSV file processed: ${headers.length} columns, ${csvData.data.length} rows`);
+        }
+
+        function processCsvUpload() {
+            const courseNameCol = document.getElementById('mapCourseName').value;
+            const addressCol = document.getElementById('mapAddress').value;
+            const cityCol = document.getElementById('mapCity').value;
+            const stateCol = document.getElementById('mapState').value;
+            const zipCol = document.getElementById('mapZip').value;
+            const websiteCol = document.getElementById('mapWebsite').value;
+
+            if (!courseNameCol || !cityCol) {
+                showStatus('❌ Please map at least Course Name and City columns', 'error', 'newCourseStatus');
+                return;
+            }
+
+            let processed = 0;
+            let skipped = 0;
+
+            csvData.data.forEach(row => {
+                const courseName = row[courseNameCol]?.trim();
+                const city = row[cityCol]?.trim();
+
+                if (courseName && city) {
+                    const newCourse = {
+                        course_number: nextCourseNumber,
+                        course_name: courseName,
+                        street_address: addressCol ? (row[addressCol]?.trim() || null) : null,
+                        city: city,
+                        state: stateCol ? (row[stateCol]?.trim() || 'MA') : 'MA',
+                        zip_code: zipCol ? (row[zipCol]?.trim() || null) : null,
+                        website: websiteCol ? (row[websiteCol]?.trim() || null) : null
+                    };
+
+                    newCoursesQueue.push(newCourse);
+                    updateNextCourseNumber();
+                    processed++;
+                } else {
+                    skipped++;
+                }
+            });
+
+            displayNewCourses();
+            showStatus(`✅ Processed ${processed} courses, skipped ${skipped} invalid rows`, 'success', 'newCourseStatus');
+            log(`CSV processing complete: ${processed} courses added, ${skipped} skipped`, 'success');
+        }
+
+        function displayNewCourses() {
+            if (newCoursesQueue.length === 0) {
+                document.getElementById('newCoursesList').classList.add('hidden');
+                return;
+            }
+
+            const html = `
+                <div style="background: #f8f9fa; border: 1px solid #e9ecef; border-radius: 8px; padding: 15px; max-height: 300px; overflow-y: auto;">
+                    ${newCoursesQueue.map((course, index) => `
+                        <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid #e9ecef;">
+                            <div>
+                                <strong>${course.course_number}</strong> - ${course.course_name}
+                                <br><small style="color: #6c757d;">${course.city}, ${course.state} ${course.zip_code || ''}</small>
+                            </div>
+                            <button onclick="removeFromQueue(${index})" class="btn" style="background: #dc2626; padding: 5px 10px; font-size: 12px;">Remove</button>
+                        </div>
+                    `).join('')}
+                </div>
+                <p><strong>Total courses ready: ${newCoursesQueue.length}</strong></p>
+            `;
+
+            document.getElementById('coursesPreview').innerHTML = html;
+            document.getElementById('newCoursesList').classList.remove('hidden');
+        }
+
+        function removeFromQueue(index) {
+            newCoursesQueue.splice(index, 1);
+            displayNewCourses();
+            log(`Removed course from queue (index ${index})`, 'info');
+        }
+
+        function clearNewCourses() {
+            newCoursesQueue = [];
+            displayNewCourses();
+            document.getElementById('pipelineSection').classList.add('hidden');
+            showStatus('🗑️ Course queue cleared', 'info', 'newCourseStatus');
+            log('Course queue cleared', 'info');
+        }
+
+        async function importNewCourses() {
+            if (newCoursesQueue.length === 0) {
+                showStatus('❌ No courses to import', 'error', 'newCourseStatus');
+                return;
+            }
+
+            try {
+                log(`🚀 Importing ${newCoursesQueue.length} new courses...`);
+                showStatus('🔄 Importing courses...', 'info', 'newCourseStatus');
+
+                let imported = 0;
+                let errors = 0;
+
+                for (const course of newCoursesQueue) {
+                    try {
+                        // Create Initial Course Upload data entry
+                        const initialUploadData = {
+                            course_number: course.course_number,
+                            course_name: course.course_name,
+                            street_address: course.street_address,
+                            city: course.city,
+                            state_or_region: course.state,
+                            zip_code: course.zip_code,
+                            website_url: course.website,
+                            process: true
+                        };
+
+                        const { error: initialUploadError } = await supabaseClient
+                            .from('initial_course_upload')
+                            .insert(initialUploadData);
+
+                        if (initialUploadError) throw initialUploadError;
+
+                        // Create primary data entry
+                        const primaryData = {
+                            course_number: course.course_number,
+                            course_name: course.course_name,
+                            course_name_source: 'manual',
+                            course_name_updated_at: new Date().toISOString(),
+                            street_address: course.street_address,
+                            street_address_source: course.street_address ? 'manual' : null,
+                            street_address_updated_at: new Date().toISOString(),
+                            city: course.city,
+                            city_source: 'manual',
+                            city_updated_at: new Date().toISOString(),
+                            state: course.state,
+                            state_source: 'manual',
+                            state_updated_at: new Date().toISOString(),
+                            zip_code: course.zip_code,
+                            zip_code_source: course.zip_code ? 'manual' : null,
+                            zip_code_updated_at: new Date().toISOString(),
+                            website: course.website,
+                            website_source: course.website ? 'manual' : null,
+                            website_updated_at: new Date().toISOString()
+                        };
+
+                        const { error: primaryError } = await supabaseClient
+                            .from('primary_data')
+                            .insert(primaryData);
+
+                        if (primaryError) throw primaryError;
+
+                        imported++;
+                        log(`✅ Imported: ${course.course_name} (${course.course_number})`, 'success');
+
+                    } catch (error) {
+                        errors++;
+                        log(`❌ Error importing ${course.course_name}: ${error.message}`, 'error');
+                    }
+                }
+
+                showStatus(`✅ Import complete: ${imported} successful, ${errors} errors`, 'success', 'newCourseStatus');
+                log(`Import summary: ${imported} imported, ${errors} errors`, 'success');
+
+                if (imported > 0) {
+                    document.getElementById('pipelineSection').classList.remove('hidden');
+                    clearNewCourses();
+                    await getNextCourseNumber(); // Update for next batch
+                }
+
+            } catch (error) {
+                showStatus(`❌ Import failed: ${error.message}`, 'error', 'newCourseStatus');
+                log(`Import failed: ${error.message}`, 'error');
+            }
+        }
+
+        function startPipeline() {
+            // Placeholder for pipeline functionality
+            showStatus('🔄 Pipeline functionality will be implemented soon...', 'info', 'newCourseStatus');
+            log('Pipeline start requested - functionality to be implemented', 'info');
+
+            // TODO: This will eventually call a Python script
+            // For now, just show a message
+            document.getElementById('pipelineBtn').disabled = true;
+            document.getElementById('pipelineBtn').innerHTML = '⏳ Pipeline Running...';
+
+            setTimeout(() => {
+                document.getElementById('pipelineBtn').disabled = false;
+                document.getElementById('pipelineBtn').innerHTML = '🚀 Start Pipeline';
+                showStatus('✅ Pipeline simulation complete', 'success', 'newCourseStatus');
+                log('Pipeline simulation completed', 'success');
+            }, 3000);
+        }
+    </script>
+</body>
+</html>

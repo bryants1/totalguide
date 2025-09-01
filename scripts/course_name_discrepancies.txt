@@ -1,0 +1,265 @@
+COURSE NAME MATCHING DISCREPANCIES
+==================================================
+
+Generated: 2025-08-04 19:58:21.003539
+
+COURSES WITH SAME NAME BUT DIFFERENT NUMBERS (63)
+--------------------------------------------------
+  1. Wyndhurst Golf & Club
+     Excel:    MA-106 | Lenox
+     Database: MA-668 | Lenox
+
+  2. Crosswinds Golf Club - Jones/Ouimet
+     Excel:    MA-110 | Plymouth
+     Database: MA-114-1 | Plymouth
+
+  3. Crosswinds Golf Club - Zaharias/Jones
+     Excel:    MA-112 | Plymouth
+     Database: MA-114-3 | Plymouth
+
+  4. Crosswinds Golf Club - Ouimet/Zaharias
+     Excel:    MA-114 | Plymouth
+     Database: MA-114-2 | Plymouth
+
+  5. Dennis Highlands GC
+     Excel:    MA-120 | Dennis
+     Database: MA-121-1 | Dennis
+
+  6. Dennis Pines GC
+     Excel:    MA-121 | Dennis
+     Database: MA-121-2 | Dennis
+
+  7. Falmouth Country Club - Osprey
+     Excel:    MA-136 | East Falmouth
+     Database: MA-139-2 | East Falmouth
+
+  8. Far Corner Golf Course - Fox/Heron
+     Excel:    MA-137 | West Boxford
+     Database: MA-144-1 | West Boxford
+
+  9. Falmouth Country Club - Talon 9
+     Excel:    MA-139 | East Falmouth
+     Database: MA-139-1 | East Falmouth
+
+ 10. Far Corner Golf Course - Heron/Hawk
+     Excel:    MA-143 | West Boxford
+     Database: MA-144-3 | West Boxford
+
+ 11. Far Corner Golf Course - Hawk/Fox
+     Excel:    MA-144 | West Boxford
+     Database: MA-144-2 | West Boxford
+
+ 12. Forest Park Adams Country Club
+     Excel:    MA-156 | Adams
+     Database: MA-629 | Adams
+
+ 13. Granite Links - Quincy/Granite
+     Excel:    MA-177 | Quincy
+     Database: MA-179-3 | Quincy
+
+ 14. Ponkapoag Golf Club - #1
+     Excel:    MA-2 | Canton
+     Database: MA-2-1 | Canton
+
+ 15. Heather Hill CC - North/Middle
+     Excel:    MA-200 | Plainville
+     Database: MA-314-2 | Plainville
+
+ 16. Heather Hill CC - North/South
+     Excel:    MA-207 | Plainville
+     Database: MA-314-3 | Plainville
+
+ 17. Bayberry Hills Golf Club - Red/White
+     Excel:    MA-25 | West Yarmouth
+     Database: MA-25-2 | West Yarmouth
+
+ 18. Bayberry Hills Golf Club - Blue (Links 9)/Red
+     Excel:    MA-250 | West Yarmouth
+     Database: MA-25-1 | West Yarmouth
+
+ 19. Juniper Hill GC - Riverside
+     Excel:    MA-255 | Northborough
+     Database: MA-256-2 | Northborough
+
+ 20. Juniper Hill GC - Lakeside
+     Excel:    MA-256 | Northborough
+     Database: MA-256-1 | Northborough
+
+ 21. King Rail Reserve GC
+     Excel:    MA-266 | Lynnfield
+     Database: MA-635 | Lynnfield
+
+ 22. Ponkapoag Golf Club - #2
+     Excel:    MA-3 | Canton
+     Database: MA-2-2 | Canton
+
+ 23. Maynard Country Club
+     Excel:    MA-306 | Maynard
+     Database: MA-637 | Maynard
+
+ 24. Thomas Memorial Golf & CC
+     Excel:    MA-309 | Turners Falls
+     Database: MA-653 | Turners Falls
+
+ 25. Heather Hill CC - Middle/South
+     Excel:    MA-314 | Plainville
+     Database: MA-314-1 | Plainville
+
+ 26. Country Club of New Seabury - Dunes
+     Excel:    MA-346 | Mashpee
+     Database: MA-347-1 | Mashpee
+
+ 27. Country Club of New Seabury - Ocean
+     Excel:    MA-347 | Mashpee
+     Database: MA-347-2 | Mashpee
+
+ 28. Pinehills Golf Club - Rees Jones
+     Excel:    MA-387 | Plymouth
+     Database: MA-399-1 | Plymouth
+
+ 29. Pinehills Golf Club - Nicklaus
+     Excel:    MA-399 | Plymouth
+     Database: MA-399-2 | Plymouth
+
+ 30. Sassamon Trace GC
+     Excel:    MA-455 | Natick
+     Database: MA-455-1 | Natick
+
+ 31. Blue Rock Golf Course
+     Excel:    MA-47 | South Yarmouth
+     Database: MA-247 NEED NEW NUMBER | South Yarmouth
+
+ 32. Squirrel Run Country Club
+     Excel:    MA-475 | Plymouth
+     Database: MA-554 | Plymouth
+
+ 33. Stow Acres CC - North Course
+     Excel:    MA-493 | Stow
+     Database: MA-494-2 | Stow
+
+ 34. Swansea Country Club - Championship
+     Excel:    MA-502 | Swansea
+     Database: MA-503-1 | Swansea
+
+ 35. Swansea Country Club - Executive
+     Excel:    MA-503 | Swansea
+     Database: MA-503-2 | Swansea
+
+ 36. Waverly Oaks Golf Club - Championship
+     Excel:    MA-515 | Plymouth
+     Database: MA-585-2 | Plymouth
+
+ 37. The Ledges Municipal GC
+     Excel:    MA-521 | South Hadley
+     Database: MA-648 | South Hadley
+
+ 38. The Meadow at Peabody
+     Excel:    MA-523 | Peabody
+     Database: MA-650 | Peabody
+
+ 39. The Woods of Westminster
+     Excel:    MA-529 | Westminster
+     Database: MA-652 | Westminster
+
+ 40. Touisset Country Club
+     Excel:    MA-535 | Swansea
+     Database: MA-654 | Swansea
+
+ 41. Twin Brooks Golf Course
+     Excel:    MA-543 | Hyannis
+     Database: MA-655 | Hyannis
+
+ 42. Unicorn Golf Course
+     Excel:    MA-549 | Stoneham
+     Database: MA-656 | Stoneham
+
+ 43. Veterans Memorial Golf Course
+     Excel:    MA-553 | Springfield
+     Database: MA-657 | Springfield
+
+ 44. Village Links Golf Club
+     Excel:    MA-554 | Plymouth
+     Database: MA-556 | Plymouth
+
+ 45. Wachusett Country Club
+     Excel:    MA-556 | West Boylston
+     Database: MA-658 | West Boylston
+
+ 46. Wahconah Country Club
+     Excel:    MA-562 | Dalton
+     Database: MA-577 | Dalton
+
+ 47. Wampanoag Golf Course
+     Excel:    MA-567 | North Swansea
+     Database: MA-659 | North Swansea
+
+ 48. Waubeeka Golf Links
+     Excel:    MA-572 | Williamstown
+     Database: MA-582 | Williamstown
+
+ 49. Waverly Oaks Golf Club - Challenger 9
+     Excel:    MA-575 | Plymouth
+     Database: MA-585-1 | Plymouth
+
+ 50. Wayland Country Club
+     Excel:    MA-577 | Wayland
+     Database: MA-660 | Wayland
+
+ 51. Wenham Country Club
+     Excel:    MA-582 | Wenham
+     Database: MA-596 | Wenham
+
+ 52. Wentworth Hills Golf & CC
+     Excel:    MA-584 | Plainville
+     Database: MA-661 | Plainville
+
+ 53. Westboro Country Club
+     Excel:    MA-585 | Westborough
+     Database: MA-662 | Westborough
+
+ 54. Westminster Country Club
+     Excel:    MA-587 | Westminster
+     Database: MA-663 | Westminster
+
+ 55. Westover Municipal Golf Club
+     Excel:    MA-589 | Granby
+     Database: MA-664 | Granby
+
+ 56. Whaling City GC at New Bedford
+     Excel:    MA-590 | New Bedford
+     Database: MA-665 | New Bedford
+
+ 57. Widows Walk Golf Course
+     Excel:    MA-596 | Scituate
+     Database: MA-615 | Scituate
+
+ 58. Woburn Country Club
+     Excel:    MA-605 | Woburn
+     Database: MA-667 | Woburn
+
+ 59. The Links at Worthington
+     Excel:    MA-615 | Worthington
+     Database: MA-649 | Worthington
+
+ 60. Captains Golf Course - Port
+     Excel:    MA-72 | Brewster
+     Database: MA-73-2 | Brewster
+
+ 61. Captains GC - Starboard
+     Excel:    MA-73 | Brewster
+     Database: MA-73-1 | Brewster
+
+ 62. Cyprian Keys GC - Par 3
+     Excel:    MA-80 | Boylston
+     Database: MA-82-2 | Boylston
+
+ 63. Cyprian Keys GC - Championship
+     Excel:    MA-82 | Boylston
+     Database: MA-82-1 | Boylston
+
+POTENTIAL FUZZY MATCHES (1)
+------------------------------
+  1. Similarity: 0.828
+     Excel:    'Crumpin Fox Club' (MA-111) - Bernardston
+     Database: 'Crumpin-Fox Golf Club' (MA-111) - Bernardston
+

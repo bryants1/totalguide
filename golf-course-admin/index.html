@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Golf Course Admin Interface - Professional</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+
+    <!-- CSS Files -->
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/components.css">
+    <link rel="stylesheet" href="css/responsive.css">
+
+    <!-- Admin Settings Styles - ADD THIS LINE -->
+    <style>
+        /* Admin Settings Icon positioned to not interfere with existing UI */
+        .admin-settings-icon {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: linear-gradient(135deg, #374151, #1f2937);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            font-size: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            z-index: 1000;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .admin-settings-icon:hover {
+            background: linear-gradient(135deg, #1f2937, #111827);
+            transform: scale(1.1) rotate(90deg);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Ensure admin icon doesn't interfere with mobile menu */
+        @media (max-width: 768px) {
+            .admin-settings-icon {
+                top: 15px;
+                right: 15px;
+                width: 45px;
+                height: 45px;
+                font-size: 18px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🏌️ Golf Course Admin Interface</h1>
+            <p>Professional golf course data management with complete field coverage and smart data promotion</p>
+
+            <div class="status-banner">
+                <h3>🎯 Complete System Features</h3>
+                <p><strong>All 82 fields</strong> from course_scraping_data are mapped with intelligent data priority system and manual edit protection.</p>
+                <div class="priority-badges">
+                    <span class="priority-badge">🏆 Google Places (Priority 1)</span>
+                    <span class="priority-badge">🥈 Course Info (Priority 2)</span>
+                    <span class="priority-badge">🥉 Initial Upload (Priority 3)</span>
+                    <span class="priority-badge">👤 Manual (Protected)</span>
+                </div>
+            </div>
+
+            <!-- Login Section - Hidden after successful connection -->
+            <div id="loginSection" class="login-section">
+                <div class="form-group">
+                    <label for="supabaseUrl">Supabase Project URL</label>
+                    <input type="text" id="supabaseUrl" placeholder="https://your-project.supabase.co">
+                    <small class="form-help">💾 Your credentials are saved automatically</small>
+                </div>
+
+                <div class="form-group">
+                    <label for="supabaseKey">Supabase Anon Key</label>
+                    <input type="password" id="supabaseKey" placeholder="Your anon key">
+                    <small class="form-help">🔒 Stored securely in browser</small>
+                </div>
+
+                <div class="form-actions">
+                    <button onclick="connectDatabase()" class="btn" id="connectBtn">Connect to Database</button>
+                    <button onclick="clearStoredCredentials()" class="btn btn-secondary" id="clearCredsBtn" title="Clear saved credentials">
+                        🗑️ Clear Saved
+                    </button>
+                </div>
+
+                <div id="connectionStatus"></div>
+            </div>
+
+            <!-- Connected Status Section - Shown after successful connection -->
+            <div id="connectedSection" class="connected-section hidden">
+                <div class="connected-banner">
+                    <div>
+                        <h3>✅ Connected to Database</h3>
+                        <p>Successfully connected to your Supabase project</p>
+                    </div>
+                    <button onclick="disconnectDatabase()" class="btn btn-secondary btn-small">
+                        🔌 Disconnect
+                    </button>
+                </div>
+            </div>
+
+            <!-- Course Selection Section -->
+            <div id="courseSelection" class="course-selection hidden">
+                <div class="course-selection-header">
+                    <h3>🎯 Select Golf Course</h3>
+                    <div id="searchStats" class="search-stats-container"></div>
+                </div>
+
+                <!-- Search Box Section -->
+                <div class="search-section">
+                    <div class="search-input-group">
+                        <div class="search-box">
+                            <input
+                                type="text"
+                                id="courseSearch"
+                                placeholder="🔍 Search by course number, name, or state..."
+                                class="search-input"
+                                autocomplete="off"
+                            >
+                            <button id="clearSearchBtn" class="clear-search-btn" title="Clear search">
+                                ✕
+                            </button>
+                        </div>
+                        <div class="search-help">
+                            <span>💡 Try: "MA-", "Pebble Beach", "California", etc.</span>
+                        </div>
+                    </div>
+
+                    <!-- Search Results Preview -->
+                    <div id="searchResults" class="search-results hidden"></div>
+                </div>
+
+                <!-- Traditional Dropdown -->
+                <div class="dropdown-section">
+                    <label for="courseSelect" class="dropdown-label">
+                        📋 Or choose from dropdown:
+                    </label>
+                    <select id="courseSelect">
+                        <option value="">-- Select a course --</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <div id="courseData" class="hidden">
+            <div class="data-section">
+                <h2 id="courseTitle">Course Data</h2>
+                <div class="tabs" id="mainTabs">
+                    <!-- Tabs will be populated by JavaScript -->
+                </div>
+
+                <div id="tabContent">
+                    <!-- Tab content will be populated by JavaScript -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Edit Modal -->
+        <div id="editModal" class="edit-modal">
+            <div class="edit-modal-content">
+                <h3 id="editModalTitle">Edit Field</h3>
+                <form class="edit-form" id="editForm">
+                    <div>
+                        <label for="editFieldValue">Value:</label>
+                        <!-- Input element will be dynamically created -->
+                    </div>
+                    <div class="form-actions">
+                        <button type="button" class="cancel-btn" onclick="closeEditModal()">Cancel</button>
+                        <button type="submit" class="save-btn">
+                            <span id="saveButtonText">Save Changes</span>
+                            <span id="saveButtonSpinner" class="loading-spinner" style="display: none;"></span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Progress Update Container (hidden by default) -->
+    <div id="updateProgress" class="progress-container">
+        <div class="progress-header">
+            <h3>🔄 Update Progress</h3>
+            <button onclick="progressTracker.hide()" class="close-btn">✕</button>
+        </div>
+        <div id="progressContent" class="progress-content">
+            <!-- Progress items will be added here dynamically -->
+        </div>
+    </div>
+
+    <!-- JavaScript Modules -->
+    <script src="js/components/admin-settings.js"></script>
+    <script>
+// Debug script - add this temporarily
+window.addEventListener('DOMContentLoaded', () => {
+    console.log('=== ADMIN SETTINGS DEBUG ===');
+    console.log('1. Testing if AdminSettingsManager exists...');
+
+    if (typeof AdminSettingsManager !== 'undefined') {
+        console.log('✅ AdminSettingsManager class found');
+
+        console.log('2. Testing instantiation...');
+        try {
+            const testAdmin = new AdminSettingsManager();
+            console.log('✅ AdminSettingsManager instantiated successfully');
+
+            console.log('3. Testing initialization...');
+            testAdmin.init();
+            console.log('✅ AdminSettingsManager.init() called');
+
+            console.log('4. Checking if icon was created...');
+            const icons = document.querySelectorAll('.admin-settings-icon');
+            console.log(`Found ${icons.length} admin icons`);
+
+            if (icons.length > 0) {
+                console.log('✅ Admin icon found in DOM');
+                icons.forEach((icon, index) => {
+                    console.log(`Icon ${index}:`, {
+                        visible: icon.offsetParent !== null,
+                        style: window.getComputedStyle(icon).display,
+                        position: window.getComputedStyle(icon).position,
+                        zIndex: window.getComputedStyle(icon).zIndex
+                    });
+                });
+            } else {
+                console.log('❌ No admin icons found in DOM');
+            }
+
+        } catch (error) {
+            console.error('❌ Error during testing:', error);
+            console.error('Error stack:', error.stack);
+        }
+    } else {
+        console.error('❌ AdminSettingsManager class not found');
+        console.log('Available global objects:', Object.keys(window).filter(key => key.includes('Admin')));
+    }
+
+    console.log('=== END DEBUG ===');
+});
+</script>
+    <script type="module" src="js/app.js"></script>
+
+    <!-- NOTE: The admin settings will be initialized automatically by the updated app.js -->
+    <!-- The admin icon and modal will be created dynamically by the AdminSettingsManager -->
+</body>
+</html>

@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debug Admin Settings</title>
+    <style>
+        /* Admin Settings Icon */
+        .admin-settings-icon {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: linear-gradient(135deg, #374151, #1f2937);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            font-size: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            z-index: 1000;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .admin-settings-icon:hover {
+            background: linear-gradient(135deg, #1f2937, #111827);
+            transform: scale(1.1) rotate(90deg);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background: #f0f0f0;
+        }
+
+        .debug-info {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .test-button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+
+        .test-button:hover {
+            background: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <h1>Admin Settings Debug Page</h1>
+
+    <div class="debug-info">
+        <h3>Debug Information:</h3>
+        <div id="debugOutput"></div>
+
+        <h3>Tests:</h3>
+        <button class="test-button" onclick="testAdminSettingsClass()">Test AdminSettingsManager Class</button>
+        <button class="test-button" onclick="testCreateIcon()">Test Create Icon Manually</button>
+        <button class="test-button" onclick="testConsoleErrors()">Check Console for Errors</button>
+    </div>
+
+    <script>
+        // Simplified AdminSettingsManager class for testing
+        class AdminSettingsManager {
+            constructor() {
+                this.modal = null;
+                this.currentSettings = this.getDefaultSettings();
+                this.isInitialized = false;
+            }
+
+            init() {
+                if (this.isInitialized) return;
+
+                this.createAdminInterface();
+                this.loadSettings();
+                this.populatePipelineSteps();
+                this.setupEventListeners();
+                this.isInitialized = true;
+
+                console.log('Admin Settings Manager initialized');
+            }
+
+            getDefaultSettings() {
+                return {
+                    scriptsDirectory: '/Users/your-username/golf-scripts',
+                    statesDirectory: '/Users/your-username/golf-states',
+                    defaultState: 'MA',
+                    apiBaseUrl: 'http://localhost:8000',
+                    apiTimeout: 300,
+                    pipelineSteps: [
+                        { id: 1, name: 'Initial Upload', script: '', manual: true, enabled: true },
+                        { id: 2, name: 'Google Places Details', script: 'run_google_places_enrichment.py', manual: false, enabled: true }
+                    ]
+                };
+            }
+
+            createAdminInterface() {
+                console.log('Creating admin interface...');
+
+                // Create admin settings icon
+                const adminIcon = document.createElement('button');
+                adminIcon.className = 'admin-settings-icon';
+                adminIcon.innerHTML = '⚙️';
+                adminIcon.title = 'Admin Settings';
+                adminIcon.onclick = () => this.open();
+                document.body.appendChild(adminIcon);
+
+                console.log('Admin icon created and added to body');
+
+                // Create minimal modal for testing
+                const modalHTML = `
+                    <div id="adminSettingsModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 2000; justify-content: center; align-items: center;">
+                        <div style="background: white; padding: 20px; border-radius: 8px; max-width: 500px;">
+                            <h2>Admin Settings</h2>
+                            <p>Admin settings modal is working!</p>
+                            <button onclick="window.adminSettings.close()">Close</button>
+                        </div>
+                    </div>
+                `;
+
+                document.body.insertAdjacentHTML('beforeend', modalHTML);
+                this.modal = document.getElementById('adminSettingsModal');
+                console.log('Admin modal created');
+            }
+
+            loadSettings() {
+                console.log('Loading settings...');
+            }
+
+            populatePipelineSteps() {
+                console.log('Populating pipeline steps...');
+            }
+
+            setupEventListeners() {
+                console.log('Setting up event listeners...');
+            }
+
+            open() {
+                console.log('Opening admin modal...');
+                if (this.modal) {
+                    this.modal.style.display = 'flex';
+                }
+            }
+
+            close() {
+                console.log('Closing admin modal...');
+                if (this.modal) {
+                    this.modal.style.display = 'none';
+                }
+            }
+
+            getSettings() {
+                return this.currentSettings;
+            }
+        }
+
+        // Test functions
+        function testAdminSettingsClass() {
+            const output = document.getElementById('debugOutput');
+
+            try {
+                // Test if class exists
+                if (typeof AdminSettingsManager === 'undefined') {
+                    output.innerHTML += '<p style="color: red;">❌ AdminSettingsManager class not found</p>';
+                    return;
+                }
+
+                output.innerHTML += '<p style="color: green;">✅ AdminSettingsManager class found</p>';
+
+                // Test instantiation
+                const adminSettings = new AdminSettingsManager();
+                output.innerHTML += '<p style="color: green;">✅ AdminSettingsManager instantiated</p>';
+
+                // Test initialization
+                adminSettings.init();
+                output.innerHTML += '<p style="color: green;">✅ AdminSettingsManager initialized</p>';
+
+                // Make it globally available
+                window.adminSettings = adminSettings;
+                output.innerHTML += '<p style="color: green;">✅ AdminSettingsManager available globally</p>';
+
+            } catch (error) {
+                output.innerHTML += `<p style="color: red;">❌ Error: ${error.message}</p>`;
+                console.error('AdminSettingsManager test error:', error);
+            }
+        }
+
+        function testCreateIcon() {
+            const output = document.getElementById('debugOutput');
+
+            try {
+                // Remove any existing icons
+                const existingIcons = document.querySelectorAll('.admin-settings-icon');
+                existingIcons.forEach(icon => icon.remove());
+
+                // Create icon manually
+                const adminIcon = document.createElement('button');
+                adminIcon.className = 'admin-settings-icon';
+                adminIcon.innerHTML = '⚙️';
+                adminIcon.title = 'Admin Settings (Manual Test)';
+                adminIcon.onclick = () => alert('Manual admin icon clicked!');
+
+                document.body.appendChild(adminIcon);
+
+                output.innerHTML += '<p style="color: green;">✅ Manual admin icon created</p>';
+
+            } catch (error) {
+                output.innerHTML += `<p style="color: red;">❌ Manual icon error: ${error.message}</p>`;
+                console.error('Manual icon creation error:', error);
+            }
+        }
+
+        function testConsoleErrors() {
+            const output = document.getElementById('debugOutput');
+            output.innerHTML += '<p style="color: blue;">ℹ️ Check the browser console (F12) for any errors or warnings</p>';
+
+            // Log some debug info
+            console.log('=== ADMIN SETTINGS DEBUG ===');
+            console.log('Document ready state:', document.readyState);
+            console.log('AdminSettingsManager available:', typeof AdminSettingsManager !== 'undefined');
+            console.log('Existing admin icons:', document.querySelectorAll('.admin-settings-icon').length);
+            console.log('Body element:', document.body);
+            console.log('=== END DEBUG ===');
+        }
+
+        // Auto-run basic test when page loads
+        window.addEventListener('DOMContentLoaded', () => {
+            console.log('Debug page loaded');
+            testConsoleErrors();
+        });
+    </script>
+</body>
+</html>

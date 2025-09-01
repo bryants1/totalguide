@@ -1,0 +1,373 @@
+/* ==========================================================================
+   GOLF COURSE ADMIN - RESPONSIVE STYLES
+   Mobile-first responsive design
+   ========================================================================== */
+
+/* Tablet Styles */
+@media (max-width: 1024px) {
+    .container {
+        padding: 15px;
+    }
+
+    .data-grid {
+        grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+        gap: 20px;
+    }
+
+    .main-sections {
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 15px;
+    }
+
+    .header {
+        padding: 35px 25px;
+    }
+
+    .header h1 {
+        font-size: 2.2rem;
+    }
+
+    .data-card, .full-width-card {
+        padding: 25px;
+    }
+}
+
+/* Mobile Styles */
+@media (max-width: 768px) {
+    .container {
+        padding: 10px;
+    }
+
+    .header {
+        padding: 25px 15px;
+        margin-bottom: 20px;
+    }
+
+    .header h1 {
+        font-size: 1.8rem;
+        text-align: center;
+    }
+
+    .header p {
+        font-size: 1rem;
+        text-align: center;
+    }
+
+    /* Priority badges stack vertically on mobile */
+    .priority-badges {
+        flex-direction: column;
+        gap: 10px;
+        align-items: center;
+    }
+
+    .priority-badge {
+        text-align: center;
+        width: 100%;
+        max-width: 250px;
+    }
+
+    /* Form elements */
+    .form-group input, .form-group select {
+        padding: 12px 15px;
+        font-size: 16px; /* Prevents zoom on iOS */
+    }
+
+    .btn {
+        width: 100%;
+        margin-right: 0;
+        margin-bottom: 10px;
+        padding: 12px 20px;
+    }
+
+    /* Data grid becomes single column */
+    .data-grid {
+        grid-template-columns: 1fr;
+        gap: 15px;
+    }
+
+    .main-sections {
+        grid-template-columns: 1fr;
+        gap: 15px;
+    }
+
+    .data-card, .full-width-card {
+        padding: 20px;
+    }
+
+    .data-card h3, .full-width-card h3 {
+        font-size: 1.1rem;
+    }
+
+    /* Field content stacks vertically */
+    .field-content {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+    }
+
+    .field-label {
+        min-width: auto;
+        width: 100%;
+    }
+
+    .field-value {
+        text-align: left;
+        max-width: none;
+        width: 100%;
+    }
+
+    /* Compact field adjustments */
+    .compact-field-row {
+        padding: 12px;
+    }
+
+    .compact-field-header {
+        margin-bottom: 8px;
+        flex-wrap: wrap;
+    }
+
+    .compact-field-actions {
+        opacity: 1; /* Always show on mobile */
+    }
+
+    /* Text field headers stack on mobile */
+    .text-field-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+
+    /* Tabs become vertical on mobile */
+    .tabs {
+        flex-direction: column;
+        border-bottom: none;
+        border-right: 2px solid #ecf0f1;
+        margin-right: 20px;
+        margin-bottom: 20px;
+    }
+
+    .tab {
+        text-align: left;
+        border-radius: 8px 0 0 8px;
+        border-bottom: none;
+        border-right: 3px solid transparent;
+        padding: 12px 20px;
+    }
+
+    .tab.active {
+        border-bottom-color: transparent;
+        border-right-color: #2d5a3d;
+    }
+
+    /* Update button */
+    .update-data-btn {
+        width: 100%;
+        justify-content: center;
+        margin-bottom: 20px;
+    }
+
+    /* Progress items */
+    .progress-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 5px;
+        padding: 12px 0;
+    }
+
+    /* Modal adjustments */
+    .edit-modal-content {
+        width: 95%;
+        max-height: 85vh;
+        padding: 25px;
+        margin: 20px;
+    }
+
+    .form-actions {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .save-btn, .cancel-btn {
+        width: 100%;
+        margin: 0;
+    }
+
+    /* Text sections */
+    .text-sections {
+        gap: 20px;
+    }
+
+    .text-field {
+        padding: 12px;
+    }
+
+    /* Data section */
+    .data-section {
+        padding: 25px 15px;
+    }
+
+    .data-section h2 {
+        font-size: 1.5rem;
+        text-align: center;
+    }
+}
+
+/* Small Mobile Styles */
+@media (max-width: 480px) {
+    .container {
+        padding: 5px;
+    }
+
+    .header {
+        border-radius: 15px;
+        padding: 20px 12px;
+    }
+
+    .header h1 {
+        font-size: 1.5rem;
+    }
+
+    .status-banner {
+        padding: 15px;
+        margin: 15px 0;
+    }
+
+    .data-card, .full-width-card {
+        padding: 15px;
+        border-radius: 12px;
+    }
+
+    .data-section {
+        padding: 20px 10px;
+        border-radius: 15px;
+    }
+
+    .edit-modal-content {
+        padding: 20px;
+        border-radius: 15px;
+    }
+
+    /* Compact spacing for small screens */
+    .compact-field-row {
+        padding: 10px 12px;
+    }
+
+    .text-field {
+        padding: 10px;
+        margin-bottom: 15px;
+    }
+
+    .field-row {
+        padding: 12px 0;
+    }
+
+    /* Button adjustments */
+    .edit-btn {
+        padding: 6px 10px;
+        font-size: 11px;
+    }
+
+    .form-group {
+        margin-bottom: 20px;
+    }
+
+    .tabs {
+        margin-right: 15px;
+        margin-bottom: 15px;
+    }
+
+    .tab {
+        padding: 10px 15px;
+        font-size: 0.9rem;
+    }
+}
+
+/* Landscape phone orientation */
+@media (max-width: 768px) and (orientation: landscape) {
+    .header h1 {
+        font-size: 1.6rem;
+    }
+
+    .data-section {
+        padding: 20px;
+    }
+
+    .edit-modal-content {
+        max-height: 80vh;
+    }
+}
+
+/* High DPI displays */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+    .source-badge {
+        font-size: 9px;
+    }
+
+    .manual-indicator {
+        font-size: 9px;
+    }
+}
+
+/* Print styles */
+@media print {
+    .header {
+        background: #2d5a3d !important;
+        color: white !important;
+        -webkit-print-color-adjust: exact;
+    }
+
+    .edit-btn, .update-data-btn {
+        display: none;
+    }
+
+    .tabs {
+        display: none;
+    }
+
+    .tab-content {
+        display: block !important;
+    }
+
+    .edit-modal {
+        display: none !important;
+    }
+
+    body {
+        background: white !important;
+    }
+}
+
+/* Focus states for accessibility */
+@media (prefers-reduced-motion: no-preference) {
+    .tab, .btn, .edit-btn, .save-btn, .cancel-btn {
+        transition: all 0.3s ease;
+    }
+}
+
+/* Reduced motion for accessibility */
+@media (prefers-reduced-motion: reduce) {
+    * {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+
+    .loading-spinner, .loader {
+        animation: none;
+    }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+    .data-card, .full-width-card {
+        border: 2px solid #000;
+    }
+
+    .field-row {
+        border-bottom: 2px solid #000;
+    }
+
+    .tab.active {
+        border-bottom: 4px solid #000;
+    }
+}

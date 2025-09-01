@@ -1,0 +1,219 @@
+{
+  "general_info": {
+    "name": {
+      "value": "Butternut Farm Golf Club"
+    },
+    "address": {
+      "value": "115 Wheeler Road, Stow, MA 01775"
+    },
+    "phone": {
+      "value": "+1 (978) 897-3400"
+    },
+    "email": {
+      "value": "kerri.butternutfarm@gmail.com"
+    },
+    "website": {
+      "value": "https://www.butternutfarm.com/"
+    },
+    "course_description": {
+      "value": [
+        "A thinking golfer’s course, the fairways at Butternut Farm Golf Club in Stow, MA, put a premium on shot accuracy.",
+        "Our course is known for its impeccable, pristine condition and having the longest hole in the country without a sand trap."
+      ]
+    },
+    "scorecard_url": {
+      "value": ""
+    },
+    "about_url": {
+      "value": "https://www.butternutfarm.com/about-our-course/"
+    },
+    "membership_url": {
+      "value": "https://www.butternutfarm.com/memberships/"
+    },
+    "tee_time_url": {
+      "value": "https://www.butternutfarm.com/tee-times/"
+    },
+    "course_type": {
+      "value": "Public"
+    },
+    "rates_url": {
+      "value": "https://www.butternutfarm.com/rates/"
+    },
+    "18_hole_course": {
+      "value": true
+    },
+    "9_hole_course": {
+      "value": false
+    },
+    "par_3_course": {
+      "value": false
+    },
+    "executive_course": {
+      "value": false
+    },
+    "ocean_views": {
+      "value": false
+    },
+    "scenic_views": {
+      "value": false
+    },
+    "signature_holes": {
+      "value": []
+    },
+    "pricing_level": {
+      "value": 3,
+      "description": "Represents upper mid-tier layouts, popular resort off-peak rates, and weekend discounts",
+      "typical_18_hole_rate": "$68.00"
+    },
+    "pricing_information": {
+      "value": "2025 Daily Rates Fees | Weekdays | | | Monday – Friday (18 holes) | $55.00 | | Monday – Thursday (9 holes) | $38.00 | | Monday – Thursday Seniors (Ages 55+) (18 Holes With Cart) | $55.00 | | Monday – Thursday Seniors (Ages 55+) (18 Holes Walking) | $38.00 | | Saturday, Sundays, Holidays | | | Before 12 PM | $68.00 | | After 12 PM | $58.00 | | After 3 PM | $48.00 | | Drive Carts | | | 18 Holes per person | $24.00 | | 9 Holes per person | $14.00 | | Pull Carts | $7.00 | Booking Tee Times – All Tee Times need to be booked in advance – online or over the phone at 978-897-3400 X2. Payment – You can pay online or with a credit card over the phone 978-897-3400 X2. No rain checks."
+    }
+  },
+  "rates": {
+    "pricing_information": {
+      "value": "2025 Daily Rates Fees | Weekdays | | | Monday – Friday (18 holes) | $55.00 | | Monday – Thursday (9 holes) | $38.00 | | Monday – Thursday Seniors (Ages 55+) (18 Holes With Cart) | $55.00 | | Monday – Thursday Seniors (Ages 55+) (18 Holes Walking) | $38.00 | | Saturday, Sundays, Holidays | | | Before 12 PM | $68.00 | | After 12 PM | $58.00 | | After 3 PM | $48.00 | | Drive Carts | | | 18 Holes per person | $24.00 | | 9 Holes per person | $14.00 | | Pull Carts | $7.00 | Booking Tee Times – All Tee Times need to be booked in advance – online or over the phone at 978-897-3400 X2. Payment – You can pay online or with a credit card over the phone 978-897-3400 X2. No rain checks."
+    }
+  },
+  "amenities": {
+    "pro_shop": {
+      "value": [],
+      "available": false
+    },
+    "driving_range": {
+      "value": [],
+      "available": false
+    },
+    "putting_green": {
+      "value": [],
+      "available": false
+    },
+    "practice_facilities": {
+      "value": [],
+      "available": false
+    },
+    "clubhouse": {
+      "value": [],
+      "available": true
+    },
+    "locker_rooms": {
+      "value": [],
+      "available": false
+    },
+    "showers": {
+      "value": [],
+      "available": false
+    },
+    "food_beverage_options": {
+      "value": "Restaurant available",
+      "available": true
+    },
+    "food_beverage_options_description": {
+      "value": "The Grille offers a variety of food and beverage options.",
+      "available": true
+    },
+    "beverage_cart": {
+      "value": [],
+      "available": false
+    },
+    "banquet_facilities": {
+      "value": [],
+      "available": true
+    }
+  },
+  "course_history": {
+    "general": {
+      "value": [
+        "The course is known for its pristine condition, value and very friendly, warm staff."
+      ]
+    },
+    "architect": {
+      "value": ""
+    },
+    "year_built": {
+      "value": null
+    },
+    "notable_events": {
+      "value": []
+    },
+    "design_features": {
+      "value": [
+        "Longest hole in the country without a sand trap."
+      ]
+    }
+  },
+  "awards": {
+    "recognitions": {
+      "value": []
+    },
+    "rankings": {
+      "value": []
+    },
+    "certifications": {
+      "value": []
+    }
+  },
+  "amateur_professional_events": {
+    "amateur_tournaments": {
+      "value": []
+    },
+    "professional_tournaments": {
+      "value": []
+    },
+    "charity_events": {
+      "value": []
+    },
+    "contact_for_events": {
+      "value": "Call the Butternut Farm Golf Club pro shop for tournament information at (978) 897-3400, ext. 12."
+    }
+  },
+  "policies": {
+    "course_policies": {
+      "value": "All Tee Times need to be booked in advance – online or over the phone at 978-897-3400 X2. Payment – You can pay online or with a credit card over the phone 978-897-3400 X2. No rain checks."
+    }
+  },
+  "social": {
+    "facebook_url": {
+      "value": "https://www.facebook.com/butternutgolf/"
+    },
+    "instagram_url": {
+      "value": "https://www.instagram.com/butternutfarmgolf/?hl=en"
+    },
+    "twitter_url": {
+      "value": "http://www.twitter.com/butternutgolf/"
+    },
+    "youtube_url": {
+      "value": ""
+    },
+    "tiktok_url": {
+      "value": ""
+    }
+  },
+  "sustainability": {
+    "general": {
+      "value": []
+    },
+    "certifications": {
+      "value": []
+    },
+    "practices": {
+      "value": []
+    }
+  },
+  "metadata": {
+    "pages_crawled": {
+      "value": 10
+    },
+    "ml_extractions": {
+      "value": 0
+    },
+    "regex_extractions": {
+      "value": 0
+    },
+    "last_updated": {
+      "value": "2025-07-23T12:44:55.755982"
+    },
+    "spider_version": {
+      "value": ""
+    }
+  }
+}
